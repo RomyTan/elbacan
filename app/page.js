@@ -60,7 +60,7 @@ export default function UnderConstruction() {
           {/* Logo dengan Container Shimmer */}
           <div className="shimmer-container mb-12">
             <Image
-              src="/elbacan-logo.svg" // Ini lgsg arah ke public/elbacan-logo.svg
+              src="images/elbacan-logo.svg" // Ini lgsg arah ke public/elbacan-logo.svg
               alt="El Bacán - Handcrafted Cigars Logo"
               width={500}
               height={443}
