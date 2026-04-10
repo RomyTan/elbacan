@@ -1,22 +1,22 @@
 "use client";
 
+import { useState } from 'react';
 import Head from 'next/head';
+import { useRouter } from 'next/navigation';
 
-export default function UnderConstruction() {
+export default function AgeVerificationPage() {
+  const [showWarning, setShowWarning] = useState(true);
+  const router = useRouter();
+  const logoPath = "/images/elbacan-logo.svg";
+  const bgImagePath = "/images/cerutu-bg.jpg";
+
   return (
     <>
       <Head>
-        <title>El Bacán - Handcrafted Cigars | Coming Soon</title>
+        <title>El Bacán - Age Verification</title>
       </Head>
 
       <style dangerouslySetInnerHTML={{ __html: `
-        @font-face {
-          font-family: 'Modesto Condensed';
-          src: url('/fonts/modesto-condensed-bold.ttf') format('truetype');
-          font-weight: bold;
-          font-style: normal;
-        }
-
         @font-face {
           font-family: 'Arpona';
           src: url('/fonts/Arpona-Regular.otf') format('truetype');
@@ -25,45 +25,83 @@ export default function UnderConstruction() {
         }
 
         html, body {
-          font-family: 'Arpona', serif;
           margin: 0;
           padding: 0;
-          background-color: #1c1c1c;
-          overflow-x: hidden; /* Mencegah scroll horizontal di mobile */
+          height: 100%;
+          overflow: hidden;
+          font-family: 'Arpona', serif;
+          color: #e6d5c3;
+          background-color: #0d0d0d;
         }
 
-        .font-modesto {
-          font-family: 'Modesto Condensed', serif;
+        .age-page-background {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-image: url('${bgImagePath}');
+          background-size: cover;
+          background-position: center;
+          z-index: -1;
         }
 
-        /* Container dibuat responsif */
+        .dark-overlay {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.75);
+          z-index: 0;
+        }
+
+        .content-wrapper {
+          position: relative;
+          z-index: 10;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          height: 100vh;
+          text-align: center;
+          padding-bottom: ${showWarning ? '80px' : '0'};
+          transition: padding 0.3s ease;
+        }
+
+        /* --- LOGO RESPONSIVE --- */
         .logo-box {
           position: relative;
           width: 100%;
-          max-width: 500px;
+          max-width: 280px; /* Ukuran mobile */
           aspect-ratio: 500 / 443;
-          margin: 0 auto 3rem auto;
+          margin: 0 auto 2rem auto;
         }
 
-        /* Render logo ngikutin 100% ukuran container */
+        @media (min-width: 768px) {
+          .logo-box {
+            max-width: 500px; /* Ukuran desktop */
+            margin-bottom: 3rem;
+          }
+        }
+        
         .base-layer {
           position: absolute;
           inset: 0;
-          background-image: url('/images/elbacan-logo.svg');
+          background-image: url('${logoPath}');
           background-size: 100% 100%;
           background-repeat: no-repeat;
           background-position: center;
         }
 
-        /* Masking juga ngikutin 100% ukuran container */
         .mask-layer {
           position: absolute;
           inset: 0;
-          -webkit-mask-image: url('/images/elbacan-logo.svg');
+          -webkit-mask-image: url('${logoPath}');
           -webkit-mask-size: 100% 100%;
           -webkit-mask-repeat: no-repeat;
           -webkit-mask-position: center;
-          mask-image: url('/images/elbacan-logo.svg');
+          mask-image: url('${logoPath}');
           mask-size: 100% 100%;
           mask-repeat: no-repeat;
           mask-position: center;
@@ -80,7 +118,7 @@ export default function UnderConstruction() {
           background: linear-gradient(
             90deg,
             transparent 0%,
-            rgba(255, 255, 255, 0.9) 50%,
+            rgba(255, 255, 255, 0.8) 50%,
             transparent 100%
           );
           transform: skewX(-25deg);
@@ -91,26 +129,133 @@ export default function UnderConstruction() {
           0% { left: -100%; }
           100% { left: 100%; }
         }
+
+        /* --- TEKS & TOMBOL --- */
+        .age-text {
+          font-family: 'Arpona', serif;
+          font-size: 1.5rem;
+          margin-bottom: 2rem;
+          color: #e6d5c3;
+          letter-spacing: 0.1rem;
+        }
+
+        @media (min-width: 768px) {
+          .age-text {
+            font-size: 2.2rem;
+          }
+        }
+
+        .button-group {
+          display: flex;
+          gap: 1rem;
+          justify-content: center;
+        }
+
+        .age-button {
+          background: transparent;
+          border: 1px solid #e6d5c3;
+          color: #e6d5c3;
+          font-family: 'Arpona', serif;
+          font-size: 1rem;
+          font-weight: bold;
+          text-transform: uppercase;
+          padding: 0.8rem 2rem;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          border-radius: 4px;
+        }
+
+        @media (min-width: 768px) {
+          .button-group {
+            gap: 2rem;
+          }
+          .age-button {
+            font-size: 1.1rem;
+            padding: 1rem 3rem;
+          }
+        }
+
+        .age-button:hover {
+          background: #e6d5c3;
+          color: #1c1c1c;
+        }
+
+        /* --- WARNING BOX --- */
+        .warning-box {
+          position: fixed;
+          bottom: 0;
+          left: 0;
+          width: 100%;
+          background: #e6d5c3;
+          color: #1c1c1c;
+          padding: 1rem;
+          text-align: center;
+          z-index: 100;
+          border-top: 1px solid rgba(28, 28, 28, 0.2);
+          font-size: 0.8rem;
+          letter-spacing: 0.05rem;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 0.5rem;
+        }
+
+        @media (min-width: 768px) {
+          .warning-box {
+            flex-direction: row;
+            font-size: 0.9rem;
+          }
+        }
+
+        .warning-box span {
+          text-transform: uppercase;
+          font-weight: bold;
+        }
+
+        .got-it-btn {
+          background: none;
+          border: none;
+          color: #1c1c1c;
+          text-decoration: underline;
+          font-family: 'Arpona', serif;
+          font-weight: bold;
+          cursor: pointer;
+          padding: 0;
+          margin-left: 0.5rem;
+          font-size: inherit;
+        }
+        .got-it-btn:hover {
+          color: #b58045;
+        }
       `}} />
 
-      <div className="min-h-screen bg-[#1c1c1c] flex flex-col justify-center items-center px-6 text-[#e6d5c3]">
-        <div className="text-center flex flex-col items-center w-full">
-          
-          <div className="logo-box">
-            <div className="base-layer"></div>
-            <div className="mask-layer">
-              <div className="light-beam"></div>
-            </div>
+      <div className="age-page-background" />
+      <div className="dark-overlay" />
+
+      <div className="content-wrapper">
+        <div className="logo-box">
+          <div className="base-layer"></div>
+          <div className="mask-layer">
+            <div className="light-beam"></div>
           </div>
-          
-          <h2 className="font-modesto text-2xl md:text-3xl tracking-widest uppercase mb-4 text-[#D5B557] relative z-10">
-            LA TRADICIÓN SE FUMA CON ESTILO
-          </h2>
-          <p className="text-[#e6d5c3] opacity-80 text-base md:text-lg max-w-2xl mx-auto tracking-wide relative z-10">
-            Our master craftsmen are perfecting a unique digital journey. <br className="hidden md:block" /> Check back soon for the experience.
-          </p>
+        </div>
+
+        <p className="age-text">Are You 21+ years of age?</p>
+        <div className="button-group">
+          <button onClick={() => router.push('/home')} className="age-button">YES</button>
+          <button className="age-button">NO</button>
         </div>
       </div>
+
+      {showWarning && (
+        <div className="warning-box">
+          <div>
+            <span>SURGEON GENERAL WARNING:</span> Cigars are not a safe alternative to cigarettes.
+          </div>
+          <button onClick={() => setShowWarning(false)} className="got-it-btn">Got it.</button>
+        </div>
+      )}
     </>
   );
 }
