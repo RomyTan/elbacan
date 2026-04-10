@@ -1,20 +1,19 @@
 "use client";
 
 import { useState } from 'react';
-import Head from 'next/head';
 import { useRouter } from 'next/navigation';
 
 export default function AgeVerificationPage() {
   const [showWarning, setShowWarning] = useState(true);
   const router = useRouter();
-  const logoPath = "/images/elbacan-logo.svg";
+  
+  // Pastikan nama file logonya udah lo ganti jadi v2 biar gak nyangkut cache
+  const logoPath = "/images/elbacan-logo-v2.svg"; 
   const bgImagePath = "/images/cerutu-bg.jpg";
 
   return (
     <>
-      <Head>
-        <title>El Bacán - Age Verification</title>
-      </Head>
+      <title>El Bacán - Age Verification</title>
 
       <style dangerouslySetInnerHTML={{ __html: `
         @font-face {
@@ -69,18 +68,17 @@ export default function AgeVerificationPage() {
           transition: padding 0.3s ease;
         }
 
-        /* --- LOGO RESPONSIVE --- */
         .logo-box {
           position: relative;
           width: 100%;
-          max-width: 280px; /* Ukuran mobile */
+          max-width: 280px; 
           aspect-ratio: 500 / 443;
           margin: 0 auto 2rem auto;
         }
 
         @media (min-width: 768px) {
           .logo-box {
-            max-width: 500px; /* Ukuran desktop */
+            max-width: 500px;
             margin-bottom: 3rem;
           }
         }
@@ -130,7 +128,6 @@ export default function AgeVerificationPage() {
           100% { left: 100%; }
         }
 
-        /* --- TEKS & TOMBOL --- */
         .age-text {
           font-family: 'Arpona', serif;
           font-size: 1.5rem;
@@ -180,7 +177,6 @@ export default function AgeVerificationPage() {
           color: #1c1c1c;
         }
 
-        /* --- WARNING BOX --- */
         .warning-box {
           position: fixed;
           bottom: 0;
@@ -244,7 +240,7 @@ export default function AgeVerificationPage() {
         <p className="age-text">Are You 21+ years of age?</p>
         <div className="button-group">
           <button onClick={() => router.push('/home')} className="age-button">YES</button>
-          <button className="age-button">NO</button>
+          <button onClick={() => window.location.href = 'https://google.com'} className="age-button">NO</button>
         </div>
       </div>
 

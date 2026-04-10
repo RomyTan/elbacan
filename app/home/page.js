@@ -8,9 +8,9 @@ export default function HomePage() {
 
   return (
     <>
-      <Head>
+
         <title>El Bacán - Home</title>
-      </Head>
+
 
       <style dangerouslySetInnerHTML={{ __html: `
         @font-face {
