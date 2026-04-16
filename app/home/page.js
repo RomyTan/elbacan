@@ -1,6 +1,5 @@
 "use client";
 
-import Head from 'next/head';
 import Image from 'next/image';
 
 export default function HomePage() {
@@ -8,9 +7,7 @@ export default function HomePage() {
 
   return (
     <>
-
-        <title>El Bacán - Home</title>
-
+      <title>El Bacán - Home</title>
 
       <style dangerouslySetInnerHTML={{ __html: `
         @font-face {
@@ -24,7 +21,7 @@ export default function HomePage() {
           font-family: 'Arpona', serif;
           margin: 0;
           padding: 0;
-          background-color: #0d0d0d;
+          background-color: #000000; /* Hero Image background = Black */
           height: 100%;
         }
 
@@ -34,16 +31,31 @@ export default function HomePage() {
           display: flex;
           flex-direction: column;
           overflow: hidden;
+          background-color: #000000;
         }
 
-        /* --- BACKGROUND (Tanpa Overlay) --- */
+        /* --- BACKGROUND --- */
         .hero-bg {
           position: absolute;
           inset: 0;
           background-image: url('${bgImagePath}');
           background-size: cover;
           background-position: center;
+          opacity: 0.7; /* Image = 70% */
           z-index: 0;
+        }
+
+        .hero-gradient {
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(
+            to bottom,
+            rgba(0, 0, 0, 0.9) 0%,     /* Hitam gelap di atap (0%) */
+            transparent 25%,           /* Mulai transparan di 25% */
+            transparent 65%,           /* Tetap transparan sampai 65% (area wajah) */
+            #000000 100%               /* Hitam pekat di dasar (100%) */
+          );
+          z-index: 1;
         }
 
         /* --- NAVBAR --- */
@@ -59,10 +71,10 @@ export default function HomePage() {
         }
         .nav-links {
           display: flex;
-          gap: 3rem;
-          font-size: 0.85rem;
-          font-weight: bold;
-          letter-spacing: 0.2em;
+          gap: 7rem;
+          font-size: 20px;
+          font-weight: normal;
+          letter-spacing: 0.1em;
           text-transform: uppercase;
           flex: 1;
         }
@@ -73,11 +85,17 @@ export default function HomePage() {
           text-decoration: none;
           transition: color 0.3s;
         }
-        .nav-links a:hover { color: #D5B557; }
+        .nav-links a:hover { color: #89582F; }
         
         .nav-logo {
           flex: 0 0 auto;
-          margin: 0 3rem;
+          margin: 0 5rem;
+          display: flex;
+          justify-content: center;
+        }
+
+        .hamburger-menu {
+          display: none;
         }
 
         /* --- MAIN CONTENT --- */
@@ -93,26 +111,44 @@ export default function HomePage() {
           text-align: center;
           box-sizing: border-box;
         }
-        .hero-title {
-          font-size: 3rem;
-          font-style: italic;
-          letter-spacing: 0.1em;
-          color: #e6d5c3;
-          margin-bottom: 1.2rem;
+        
+        /* Wrapper biar divider sama lebarnya dengan teks */
+        .text-wrapper {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          max-width: 860px;
         }
+
+        .hero-title {
+          font-family: 'Arpona', serif;
+          font-size: 48px; /* Font 48px */
+          font-style: italic; /* Arpona Regular Italic */
+          font-weight: normal;
+          letter-spacing: 0.03em;
+          color: #e6d5c3;
+          margin-bottom: 0.2rem;
+          line-height: 1.2;
+          text-align: center;
+        }
+
         .hero-divider {
-          width: 100%;
-          max-width: 600px;
-          height: 1px;
+          width: 100%; /* Divider dibawahnya sesuai width tulisan */
+          height: 2px;
           background: rgba(181, 128, 69, 0.6);
+          margin-top: 1rem;
           margin-bottom: 1.5rem;
         }
+
         .hero-desc {
+          font-family: 'Arpona', serif;
+          font-size: 26px;
+          font-weight: normal;
           color: rgba(230, 213, 195, 0.9);
-          font-size: 1.1rem;
-          line-height: 1.6;
-          max-width: 650px;
-          margin-bottom: 2rem;
+          line-height: 1.4;
+          width: 100%;
+          margin-bottom: 2.5rem;
+          text-align: center;
         }
         
         /* --- BUTTONS --- */
@@ -123,10 +159,15 @@ export default function HomePage() {
         .btn {
           font-family: 'Arpona', serif;
           font-weight: bold;
-          letter-spacing: 0.15em;
+          letter-spacing: 0.0em;
           text-transform: uppercase;
-          font-size: 0.85rem;
-          padding: 1rem 3.5rem;
+          font-size: 20px;
+          width: 220px;
+          padding: 12px 36px;
+          box-sizing: border-box;
+          display: flex;
+          justify-content: center;
+          align-items: center;
           cursor: pointer;
           transition: all 0.3s;
         }
@@ -154,29 +195,68 @@ export default function HomePage() {
           color: #b58045;
           font-style: italic;
           letter-spacing: 0.15em;
-          font-size: 0.85rem;
+          font-size: 14px;
           margin: 0;
         }
 
         /* --- RESPONSIVE MOBILE --- */
         @media (max-width: 768px) {
-          .navbar { padding: 1rem; justify-content: center; }
+          .hero-bg {
+            background-position: 65% center; 
+          }
+          .navbar { 
+            padding: 1.5rem; 
+            justify-content: flex-start; /* Ruang untuk hamburger di kiri */
+          }
           .nav-links { display: none; }
-          .nav-logo { margin: 0; }
-          .hero-bg {background-position: 67% center; }
-          .hero-title { font-size: 2rem; }
-          .hero-buttons { flex-direction: column; gap: 1rem; width: 100%; max-width: 300px; }
-          .btn { width: 100%; padding: 1rem; }
+          
+          .hamburger-menu {
+            display: block;
+            width: 30px;
+            height: auto;
+            cursor: pointer;
+            position: absolute;
+            left: 1.5rem;
+          }
+
+          .nav-logo { 
+            margin: 0 auto; 
+          }
+          /* Logo Width 140px */
+          .nav-logo img {
+            width: 140px !important;
+            height: auto !important;
+          }
+
+          .hero-title { 
+            font-size: 32px; /* Jadi 32px Center */
+            white-space: pre-line; /* Memungkinkan teks turun (break) otomatis */
+          }
+          .hero-desc {
+            font-size: 14px; 
+          }
+          .hero-buttons { 
+            flex-direction: row; 
+            gap: 15px; 
+            width: 100%;
+            justify-content: center;
+          }
+          .btn { 
+            width: 156px;
+            padding: 12px 0; 
+            font-size: 16px;
+          }
         }
       `}} />
 
       <div className="home-container">
         
-        {/* Background Pure */}
         <div className="hero-bg"></div>
+        <div className="hero-gradient"></div>
 
-        {/* Navbar */}
         <nav className="navbar">
+          <img src="/images/hamburger.svg" alt="Menu" className="hamburger-menu" />
+
           <div className="nav-links left">
             <a href="#">Collection</a>
             <a href="#">Discover</a>
@@ -184,7 +264,7 @@ export default function HomePage() {
           
           <div className="nav-logo">
             <Image
-              src="/images/elbacan-logo.svg"
+              src="/images/elbacan-logo-v2.svg"
               alt="El Bacán Logo"
               width={200}
               height={180} 
@@ -198,20 +278,21 @@ export default function HomePage() {
           </div>
         </nav>
 
-        {/* Main Content */}
         <main className="hero-content">
-          <h1 className="hero-title">LA TRADICIÓN SE FUMA CON ESTILO</h1>
-          <div className="hero-divider"></div>
-          <p className="hero-desc">
-            Premium handmade cigars from Nicaragua. Consistent in construction, refined in character, and made for those who expect more.
-          </p>
+          <div className="text-wrapper">
+            <h1 className="hero-title">LA TRADICIÓN SE FUMA CON ESTILO</h1>
+            <div className="hero-divider"></div>
+            <p className="hero-desc">
+              Premium handmade cigars from Nicaragua. Consistent in construction, refined in character, and made for those who expect more.
+            </p>
+          </div>
+          
           <div className="hero-buttons">
             <button className="btn btn-primary">Collection</button>
             <button className="btn btn-secondary">Discover</button>
           </div>
         </main>
 
-        {/* Bottom Statement */}
         <div className="hero-footer">
           <p>NOT JUST A CIGAR. A STATEMENT OF PRESENCE...</p>
         </div>
