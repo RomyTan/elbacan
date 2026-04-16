@@ -4,7 +4,7 @@ import Head from 'next/head';
 import Image from 'next/image';
 
 export default function HomePage() {
-  const bgImagePath = "/images/hero-bg-angel.jpg"; 
+  const bgImagePath = "/images/hero-bg-angel2b.jpg"; 
 
   return (
     <>
