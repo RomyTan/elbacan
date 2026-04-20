@@ -112,9 +112,9 @@ export default function ElBacanApp() {
         @keyframes bgFadeIn { 0% { opacity: 0; } 100% { opacity: 0.7; } }
         
         @keyframes floatSmoke {
-          0% { transform: scale(1) rotate(0deg); opacity: 0.2; }
-          50% { transform: scale(0.95) rotate(0.2deg); opacity: 0.85; }
-          100% { transform: scale(0.99) rotate(-0.2deg); opacity: 0; }
+          0% { transform: scale(1) rotate(0deg); opacity: 0; }
+          50% { transform: scale(1.03) rotate(0.5deg); opacity: 0.85; }
+          100% { transform: scale(1.01) rotate(-0.5deg); opacity: 0; }
         }
 
         @keyframes navSlideDown { 0% { opacity: 0; transform: translateY(-20px); } 100% { opacity: 1; transform: translateY(0); } }
@@ -130,7 +130,7 @@ export default function ElBacanApp() {
         .smoke-wrapper { position: absolute; inset: 0; z-index: 1; opacity: 0; animation: bgFadeIn 1.5s ease-out 0.2s forwards; }
         .smoke-layer { 
           position: absolute; inset: 0; background-image: url('${smokeImagePath}'); background-size: cover; background-position: center top; 
-          transform-origin: center bottom; animation: floatSmoke 8s infinite ease-out; animation-delay: 1.5s; 
+          transform-origin: center top; animation: floatSmoke 8s infinite ease-out; animation-delay: 1.5s; 
         }
 
         .hero-gradient { position: absolute; inset: 0; background: linear-gradient( to bottom, rgba(0, 0, 0, 0.9) 0%, transparent 25%, transparent 65%, #000000 100% ); z-index: 2; }
