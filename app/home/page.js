@@ -112,28 +112,28 @@ export default function HomePage() {
           stroke-dasharray: 1000;
           stroke-dashoffset: 1000;
           /* Durasi per huruf diperlambat jadi 0.8s */
-          animation: drawSignature 0.8s ease-in-out forwards;
+          animation: drawSignature 1s ease-in-out forwards;
         }
 
         /* Delay bertingkat supaya muncul berurutan (0.3s antar goresan) */
         .signature-container path:nth-child(1) { animation-delay: 1.8s; }
         .signature-container path:nth-child(2) { animation-delay: 2.1s; }
-        .signature-container path:nth-child(3) { animation-delay: 2.3s; }
-        .signature-container path:nth-child(4) { animation-delay: 2.6s; }
-        .signature-container path:nth-child(5) { animation-delay: 2.9s; }
-        .signature-container path:nth-child(6) { animation-delay: 3.2s; }
-        .signature-container path:nth-child(7) { animation-delay: 3.5s; }
-        .signature-container path:nth-child(8) { animation-delay: 3.8s; }
-        .signature-container path:nth-child(9) { animation-delay: 4.1s; }
-        .signature-container path:nth-child(10) { animation-delay: 4.4s; }
-        .signature-container path:nth-child(11) { animation-delay: 4.7s; }
-        .signature-container path:nth-child(12) { animation-delay: 5.0s; }
-        .signature-container path:nth-child(13) { animation-delay: 5.3s; }
-        .signature-container path:nth-child(14) { animation-delay: 5.6s; }
-        .signature-container path:nth-child(15) { animation-delay: 5.9s; }
-        .signature-container path:nth-child(16) { animation-delay: 6.2s; }
-        .signature-container path:nth-child(17) { animation-delay: 6.5s; }
-        .signature-container path:nth-child(18) { animation-delay: 6.8s; }
+        .signature-container path:nth-child(3) { animation-delay: 2.15s; }
+        .signature-container path:nth-child(4) { animation-delay: 2.2s; }
+        .signature-container path:nth-child(5) { animation-delay: 2.5s; }
+        .signature-container path:nth-child(6) { animation-delay: 2.8s; }
+        .signature-container path:nth-child(7) { animation-delay: 3.1s; }
+        .signature-container path:nth-child(8) { animation-delay: 3.4s; }
+        .signature-container path:nth-child(9) { animation-delay: 3.7s; }
+        .signature-container path:nth-child(10) { animation-delay: 4.0s; }
+        .signature-container path:nth-child(11) { animation-delay: 4.3s; }
+        .signature-container path:nth-child(12) { animation-delay: 4.6s; }
+        .signature-container path:nth-child(13) { animation-delay: 4.9s; }
+        .signature-container path:nth-child(14) { animation-delay: 5.2s; }
+        .signature-container path:nth-child(15) { animation-delay: 5.5s; }
+        .signature-container path:nth-child(16) { animation-delay: 5.8s; }
+        .signature-container path:nth-child(17) { animation-delay: 5.9s; }
+        .signature-container path:nth-child(18) { animation-delay: 6.2s; }
 
         @keyframes drawSignature {
           to { stroke-dashoffset: 0; }
