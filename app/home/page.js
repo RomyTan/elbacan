@@ -87,7 +87,7 @@ export default function HomePage() {
         /* --- STYLING TITLE FONT GREAT VIBES --- */
         .hero-title {
           font-family: 'GreatVibes', cursive;
-          font-size: 92px;
+          font-size: 76px;
           font-weight: normal;
           color: #e6d5c3;
           margin-bottom: 0.5rem;
