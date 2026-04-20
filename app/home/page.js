@@ -22,9 +22,9 @@ export default function HomePage() {
         @keyframes bgFadeIn { 0% { opacity: 0; } 100% { opacity: 0.7; } }
 
         @keyframes floatSmoke {
-          0% { transform: translate(0px, 0px) scale(1) rotate(0deg); opacity: 0; }
-          40% { transform: translate(15px, -15px) scale(1.03) rotate(2deg); opacity: 0.85; }
-          100% { transform: translate(-20px, -45px) scale(1.1) rotate(-2deg); opacity: 0; }
+          0% { transform: translate(0px, 10px) scale(1) rotate(0deg); opacity: 0.2; }
+          40% { transform: translate(-19px, 20px) scale(1.03) rotate(5deg); opacity: 0.85; }
+          100% { transform: translate(0px, 30px) scale(1.08) rotate(0deg); opacity: 0.2; }
         }
 
         @keyframes navSlideDown {
@@ -59,12 +59,21 @@ export default function HomePage() {
         .home-container { position: relative; min-height: 100vh; display: flex; flex-direction: column; overflow: hidden; background-color: #000000; }
 
         .hero-bg {
-          position: absolute; inset: 0; background-image: url('${bgImagePath}'); background-size: cover; background-position: center; z-index: 0;
+          position: absolute; inset: 0; background-image: url('${bgImagePath}'); background-size: cover; background-position: center top; z-index: 0;
           opacity: 0; animation: bgFadeIn 1.5s ease-out 0.5s forwards;
         }
 
         .smoke-wrapper { position: absolute; inset: 0; z-index: 1; opacity: 0; animation: bgFadeIn 1.5s ease-out 0.5s forwards; }
-        .smoke-layer { position: absolute; inset: 0; background-image: url('${smokeImagePath}'); background-size: cover; background-position: center; animation: floatSmoke 12s infinite alternate ease-in-out; }
+        .smoke-layer { 
+          position: absolute; 
+          inset: 0; 
+          background-image: url('${smokeImagePath}'); 
+          background-size: cover; 
+          background-position: 
+          center top; 
+          transform-origin: center;
+          animation: floatSmoke 6s infinite alternate ease-in-out; 
+          }
 
         .hero-gradient { position: absolute; inset: 0; background: linear-gradient( to bottom, rgba(0, 0, 0, 0.9) 0%, transparent 25%, transparent 65%, #000000 100% ); z-index: 2; }
 
