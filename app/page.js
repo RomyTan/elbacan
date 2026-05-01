@@ -1,11 +1,14 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 
 export default function ElBacanApp() {
   const [stage, setStage] = useState('verification'); 
-  const [isMenuOpen, setIsMenuOpen] = useState(false); // State untuk Hamburger Menu
+  const [isMenuOpen, setIsMenuOpen] = useState(false); 
+  const [isVideoFinished, setIsVideoFinished] = useState(false); // State untuk ngecek video selesai
+  
+  const videoRef = useRef(null);
 
   const bgImagePath = "/images/hero-bg-angel2c.jpg"; 
   const smokeImagePath = "/images/smoke-effect.png";
@@ -19,6 +22,28 @@ export default function ElBacanApp() {
     }, 1200);
   };
 
+  // Logic untuk play/pause & reset video
+  useEffect(() => {
+    if (stage !== 'home' || !videoRef.current) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          videoRef.current.play();
+        } else {
+          // Pause dan reset video ke awal saat keluar dari viewport
+          videoRef.current.pause();
+          videoRef.current.currentTime = 0;
+          setIsVideoFinished(false); // Reset state agar teks hilang lagi
+        }
+      },
+      { threshold: 0.4 } 
+    );
+
+    observer.observe(videoRef.current);
+    return () => observer.disconnect();
+  }, [stage]);
+
   return (
     <>
       <title>El Bacán - Premium Cigars</title>
@@ -27,7 +52,8 @@ export default function ElBacanApp() {
         /* --- FONTS & BASE --- */
         @font-face { font-family: 'Arpona'; src: url('/fonts/Arpona-Regular.otf') format('truetype'); font-weight: normal; font-style: normal; }
         @font-face { font-family: 'GreatVibes'; src: url('/fonts/GreatVibes-Regular.ttf') format('truetype'); font-weight: normal; font-style: normal; }
-        html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; font-family: 'Arpona', serif; background-color: #000000; }
+        html, body { margin: 0; padding: 0; overflow-x: hidden; font-family: 'Arpona', serif; background-color: #000000; }
+        .hero-section-wrapper { min-height: 100vh; display: flex; flex-direction: column; scroll-snap-align: start; scroll-snap-stop: always; }
 
         /* --- AGE VERIFICATION --- */
         @keyframes softZoomIn { 0% { opacity: 0; transform: scale(1); } 100% { opacity: 0.6; transform: scale(1.8); } }
@@ -72,18 +98,20 @@ export default function ElBacanApp() {
         @keyframes navSlideDown { 0% { opacity: 0; transform: translateY(-20px); } 100% { opacity: 1; transform: translateY(0); } }
         @keyframes contentSlideUp { 0% { opacity: 0; transform: translateY(40px); } 100% { opacity: 1; transform: translateY(0); } }
 
-        .home-container { position: relative; min-height: 100vh; display: flex; flex-direction: column; overflow: hidden; background-color: #000000; animation: pageFadeIn 0.5s forwards; }
-        .hero-bg { position: absolute; inset: 0; background-image: url('${bgImagePath}'); background-size: cover; background-position: center top; z-index: 0; opacity: 0; animation: bgFadeIn 1.5s ease-out 0.2s forwards; }
-        .smoke-wrapper { position: absolute; inset: 0; z-index: 1; opacity: 0; animation: bgFadeIn 1.5s ease-out 0.2s forwards; }
+        .home-container { position: relative; min-height: 100vh; display: flex; flex-direction: column; background-color: #000000; animation: pageFadeIn 0.5s forwards; }
+        
+        .hero-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100vh; background-image: url('${bgImagePath}'); background-size: cover; background-position: center top; z-index: 0; opacity: 0; animation: bgFadeIn 1.5s ease-out 0.2s forwards; }
+        .smoke-wrapper { position: absolute; top: 0; left: 0; width: 100%; height: 100vh; z-index: 1; opacity: 0; animation: bgFadeIn 1.5s ease-out 0.2s forwards; overflow: hidden; }
         .smoke-layer { position: absolute; inset: 0; background-image: url('${smokeImagePath}'); background-size: cover; background-position: center top; transform-origin: center top; animation: floatSmoke 8s infinite ease-out; animation-delay: 1.5s; }
-        .hero-gradient { position: absolute; inset: 0; background: linear-gradient( to bottom, rgba(0, 0, 0, 0.9) 0%, transparent 25%, transparent 65%, #000000 100% ); z-index: 2; }
+        .hero-gradient { position: absolute; top: 0; left: 0; width: 100%; height: 100vh; background: linear-gradient( to bottom, rgba(0, 0, 0, 0.9) 0%, transparent 25%, transparent 65%, #000000 100% ); z-index: 2; pointer-events: none; }
 
-        /* Wrapper untuk efek geser konten saat menu terbuka */
         .content-layer {
-          position: relative; z-index: 10; display: flex; flex-direction: column; height: 100vh;
+          position: relative; z-index: 10; display: flex; flex-direction: column; min-height: 100vh;
           transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s ease;
         }
         .content-layer.shifted { transform: translateX(-60%); opacity: 0; }
+        
+        .hero-section-wrapper { min-height: 100vh; display: flex; flex-direction: column; }
 
         .navbar { display: flex; justify-content: space-between; align-items: center; padding: 2rem 4rem; width: 100%; box-sizing: border-box; }
         .nav-links { display: flex; gap: 7rem; font-size: 20px; font-weight: normal; letter-spacing: 0.1em; text-transform: uppercase; flex: 1; opacity: 0; animation: navSlideDown 0.8s ease-out 0.5s forwards; }
@@ -123,34 +151,23 @@ export default function ElBacanApp() {
         .menu-logo { margin: 1rem 0 3rem; }
         
         .menu-nav { display: flex; flex-direction: column; width: 100%; max-width: 280px; gap: 0.5rem; }
-        .menu-link { 
-          color: #fff; text-decoration: none; font-size: 18px; padding: 14px 24px; box-sizing: border-box; width: 100%;
-          opacity: 0; transform: translateX(30px); transition: all 0.4s ease;
-        }
+        .menu-link { color: #fff; text-decoration: none; font-size: 18px; padding: 14px 24px; box-sizing: border-box; width: 100%; opacity: 0; transform: translateX(30px); transition: all 0.4s ease; }
         .mobile-menu.open .menu-link { opacity: 1; transform: translateX(0); }
         .menu-link.active { background-color: #89582F; border-radius: 30px; }
 
-        /* Animasi berurutan untuk menu */
         .mobile-menu.open .menu-link:nth-child(1) { transition-delay: 0.1s; }
         .mobile-menu.open .menu-link:nth-child(2) { transition-delay: 0.2s; }
         .mobile-menu.open .menu-link:nth-child(3) { transition-delay: 0.3s; }
         .mobile-menu.open .menu-link:nth-child(4) { transition-delay: 0.4s; }
         .mobile-menu.open .menu-link:nth-child(5) { transition-delay: 0.5s; }
 
-        .menu-footer-box {
-          margin-top: auto; display: flex; flex-direction: column; align-items: center; gap: 1.5rem; width: 100%;
-          opacity: 0; transform: translateY(20px); transition: all 0.5s ease 0.6s;
-        }
+        .menu-footer-box { margin-top: auto; display: flex; flex-direction: column; align-items: center; gap: 1.5rem; width: 100%; opacity: 0; transform: translateY(20px); transition: all 0.5s ease 0.6s; }
         .mobile-menu.open .menu-footer-box { opacity: 1; transform: translateY(0); }
 
         .menu-socials { display: flex; gap: 1.5rem; }
         .menu-socials img { width: 28px; height: 28px; }
 
-        .btn-whatsapp {
-          display: flex; align-items: center; justify-content: center; gap: 10px;
-          background-color: #89582F; color: #fff; text-decoration: none; border-radius: 30px;
-          width: 100%; max-width: 280px; padding: 14px; font-size: 16px; border: none; cursor: pointer;
-        }
+        .btn-whatsapp { display: flex; align-items: center; justify-content: center; gap: 10px; background-color: #89582F; color: #fff; text-decoration: none; border-radius: 30px; width: 100%; max-width: 280px; padding: 14px; font-size: 16px; border: none; cursor: pointer; }
         .btn-whatsapp img { width: 24px; height: 24px; }
         .menu-copyright { color: #fff; font-size: 12px; margin-top: 0.5rem; }
 
@@ -166,6 +183,42 @@ export default function ElBacanApp() {
           .hero-desc { font-size: 15px; }
           .hero-buttons { flex-direction: row; gap: 15px; width: 100%; justify-content: center; margin-top: -0.75rem; margin-bottom: 0.1rem; }
           .btn { width: 156px; padding: 12px 0; font-size: 16px; margin-bottom: -1rem; }
+        }
+
+        /* =========================================
+           3. CSS SHOWCASE SECTION (THE ANATOMY)
+           ========================================= */
+        .showcase-section { position: relative; width: 100%; min-height: 100vh; background: #000000; display: flex; align-items: center; justify-content: center; padding: 6rem 10%; box-sizing: border-box; z-index: 10; overflow: hidden; scroll-snap-align: start; scroll-snap-stop: always; }
+        .showcase-bg-glow { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60vw; height: 60vw; background: radial-gradient(circle, rgba(137,88,47,0.15) 0%, transparent 60%); z-index: 0; pointer-events: none; }
+        
+        /* Video Animasi & Efek Fade Out */
+        .showcase-video-wrapper { position: absolute; inset: 0; display: flex; justify-content: center; align-items: center; z-index: 1; transition: opacity 1.5s ease-out; }
+        .showcase-video-wrapper.fade-out { opacity: 0; pointer-events: none; }
+        .showcase-video { 
+          width: 100vw; 
+          height: 100vh; 
+          object-fit: cover; /* Biar video penuh proporsional */
+        }
+
+        /* Text Content & Efek Slide In (Awalnya sembunyi) */
+        .showcase-content { position: relative; z-index: 2; width: 100%; max-width: 800px; text-align: center; opacity: 0; transform: translateX(-80px); transition: all 1.2s cubic-bezier(0.25, 1, 0.5, 1); }
+        .showcase-content.visible { opacity: 1; transform: translateX(0); transition-delay: 0.5s; /* Delay sedikit setelah video fade out */ }
+        
+        .showcase-title { font-family: 'GreatVibes', cursive; font-size: 64px; color: #b58045; margin-bottom: 0.5rem; line-height: 1; text-shadow: 0px 2px 8px rgba(0,0,0,0.8); }
+        .showcase-subtitle { font-family: 'Arpona', serif; font-size: 28px; color: #e6d5c3; margin-bottom: 2rem; text-transform: uppercase; letter-spacing: 0.1em; }
+        .showcase-text { font-size: 20px; color: rgba(230,213,195,0.9); line-height: 1.6; margin-bottom: 3rem; }
+        
+        .anatomy-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 2rem; }
+        .anatomy-list li { display: flex; flex-direction: column; align-items: center; }
+        .anatomy-title { color: #b58045; font-weight: bold; text-transform: uppercase; letter-spacing: 0.15em; font-size: 16px; margin-bottom: 0.5rem; border-bottom: 1px solid rgba(181, 128, 69, 0.4); padding-bottom: 0.5rem; display: inline-block; }
+        .anatomy-desc { color: #e6d5c3; font-size: 16px; line-height: 1.5; max-width: 600px; }
+
+        @media (max-width: 768px) {
+          .showcase-section { padding: 4rem 1.5rem; }
+          .showcase-title { font-size: 48px; }
+          .showcase-subtitle { font-size: 20px; }
+          .showcase-text { font-size: 16px; }
+          .showcase-video { max-width: 100%; transform: scale(1.2); }
         }
       `}} />
 
@@ -194,40 +247,86 @@ export default function ElBacanApp() {
           <div className="smoke-wrapper"><div className="smoke-layer"></div></div>
           <div className="hero-gradient"></div>
 
-          {/* Wrapper Konten untuk di-Push saat Menu Terbuka */}
           <div className={`content-layer ${isMenuOpen ? 'shifted' : ''}`}>
-            <nav className="navbar">
-              <img src="/images/hamburger.svg" alt="Menu" className="hamburger-menu" onClick={() => setIsMenuOpen(true)} />
-              <div className="nav-links left"><a href="#">Collection</a><a href="#">Discover</a></div>
-              
-              <div className="nav-logo">
-                <Image src="/images/elbacan-logo-v2.svg" alt="El Bacán Logo" width={200} height={180} priority />
-              </div>
+            
+            <div className="hero-section-wrapper">
+              <nav className="navbar">
+                <img src="/images/hamburger.svg" alt="Menu" className="hamburger-menu" onClick={() => setIsMenuOpen(true)} />
+                <div className="nav-links left"><a href="#">Collection</a><a href="#">Discover</a></div>
+                
+                <div className="nav-logo">
+                  <Image src="/images/elbacan-logo-v2.svg" alt="El Bacán Logo" width={200} height={180} priority />
+                </div>
 
-              <div className="nav-links right"><a href="#">Art of Aging</a><a href="#">Wholesale</a></div>
-            </nav>
+                <div className="nav-links right"><a href="#">Art of Aging</a><a href="#">Wholesale</a></div>
+              </nav>
 
-            <main className="hero-content">
-              <div className="text-wrapper">
-                <h1 className="hero-title">La tradición se fuma con estilo</h1>
-                <div className="hero-divider"></div>
-                <p className="hero-desc">
-                  Premium handmade cigars from Nicaragua. Consistent in construction, refined in character, and made for those who expect more.
-                </p>
-              </div>
-              
-              <div className="hero-buttons">
-                <button className="btn btn-primary">Collection</button>
-                <button className="btn btn-secondary">Discover</button>
-              </div>
-            </main>
+              <main className="hero-content">
+                <div className="text-wrapper">
+                  <h1 className="hero-title">La tradición se fuma con estilo</h1>
+                  <div className="hero-divider"></div>
+                  <p className="hero-desc">
+                    Premium handmade cigars from Nicaragua. Consistent in construction, refined in character, and made for those who expect more.
+                  </p>
+                </div>
+                
+                <div className="hero-buttons">
+                  <button className="btn btn-primary">Collection</button>
+                  <button className="btn btn-secondary">Discover</button>
+                </div>
+              </main>
 
-            <div className="hero-footer">
-              <p>NOT JUST A CIGAR. A STATEMENT OF PRESENCE...</p>
+              <div className="hero-footer">
+                <p>NOT JUST A CIGAR. A STATEMENT OF PRESENCE...</p>
+              </div>
             </div>
+
+            {/* SECTION SHOWCASE / ANATOMY */}
+            <section className="showcase-section">
+              <div className="showcase-bg-glow"></div>
+              
+              {/* VIDEO LAYER - Fades out when isVideoFinished is true */}
+              <div className={`showcase-video-wrapper ${isVideoFinished ? 'fade-out' : ''}`}>
+                <video 
+                  ref={videoRef}
+                  muted 
+                  playsInline 
+                  className="showcase-video"
+                  onEnded={() => setIsVideoFinished(true)} // Trigger saat video selesai
+                >
+                  <source src="/videos/cigar-animation.webm" type="video/webm" />
+                  <source src="/videos/cigar-animation.mp4" type="video/mp4" />
+                </video>
+              </div>
+              
+              {/* TEXT LAYER - Slides in after video finishes */}
+              <div className={`showcase-content ${isVideoFinished ? 'visible' : ''}`}>
+                <h2 className="showcase-title">The Anatomy</h2>
+                <h3 className="showcase-subtitle">A Masterpiece Unveiled</h3>
+                <p className="showcase-text">
+                  Every El Bacán is a testament to the dedication of master blenders. A meticulous combination of the finest tobacco leaves, rolled into an unforgettable smoking experience.
+                </p>
+                
+                <ul className="anatomy-list">
+                  <li>
+                    <span className="anatomy-title">Capa (Wrapper)</span>
+                    <span className="anatomy-desc">Ecuadorian Habano Rosado — Flawless, oily, with a sophisticated touch of spice.</span>
+                  </li>
+                  <li>
+                    <span className="anatomy-title">Capote (Binder)</span>
+                    <span className="anatomy-desc">Nicaraguan Jalapa — Provides structure and a perfect balance of natural sweetness.</span>
+                  </li>
+                  <li>
+                    <span className="anatomy-title">Tripa (Filler)</span>
+                    <span className="anatomy-desc">Estelí & Condega — Deep complexity of earth, cedar, and dark chocolate.</span>
+                  </li>
+                </ul>
+              </div>
+
+            </section>
+            
           </div>
 
-          {/* Mobile Menu Overlay */}
           <div className={`mobile-menu ${isMenuOpen ? 'open' : ''}`}>
             <button className="menu-close-btn" onClick={() => setIsMenuOpen(false)}>&#10005;</button>
             
