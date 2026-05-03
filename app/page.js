@@ -6,7 +6,9 @@ import Image from 'next/image';
 export default function ElBacanApp() {
   const [stage, setStage] = useState('verification'); 
   const [isMenuOpen, setIsMenuOpen] = useState(false); 
-  const [isVideoFinished, setIsVideoFinished] = useState(false); // State untuk ngecek video selesai
+  const [isVideoFinished, setIsVideoFinished] = useState(false); 
+  const [activeSlide, setActiveSlide] = useState(0); 
+  const [activeTab, setActiveTab] = useState('ORIGINAL'); // State untuk tab Collection
   
   const videoRef = useRef(null);
 
@@ -15,6 +17,14 @@ export default function ElBacanApp() {
   const doorImagePath = "/images/elbacan-door.jpg";
   const logoPath = "/images/elbacan-logo-v2.svg";
 
+  // Data dummy untuk Our Collection
+  const collectionData = [
+    { name: 'CHURCHILL', ring: '48', length: '7"', time: '30-45min', intensity: 3, wrapper: 'Habano', image: '/images/box-churchill.png', badge: null },
+    { name: 'DOUBLE CORONA', ring: '52', length: '8"', time: '30-45min', intensity: 4, wrapper: 'Habano', image: '/images/box-double-corona.png', badge: 'BEST SELLER' },
+    { name: 'TORPEDO', ring: '52', length: '6 ½"', time: '40min', intensity: 4, wrapper: 'Habano', image: '/images/box-torpedo.png', badge: null },
+    { name: 'TORO', ring: '52', length: '6"', time: '30-45min', intensity: 2, wrapper: 'Habano', image: '/images/box-toro.png', badge: null },
+  ];
+
   const handleYesClick = () => {
     setStage('transition');
     setTimeout(() => {
@@ -22,7 +32,6 @@ export default function ElBacanApp() {
     }, 1200);
   };
 
-  // Logic untuk play/pause & reset video
   useEffect(() => {
     if (stage !== 'home' || !videoRef.current) return;
 
@@ -31,10 +40,9 @@ export default function ElBacanApp() {
         if (entry.isIntersecting) {
           videoRef.current.play();
         } else {
-          // Pause dan reset video ke awal saat keluar dari viewport
           videoRef.current.pause();
           videoRef.current.currentTime = 0;
-          setIsVideoFinished(false); // Reset state agar teks hilang lagi
+          setIsVideoFinished(false); 
         }
       },
       { threshold: 0.4 } 
@@ -44,6 +52,13 @@ export default function ElBacanApp() {
     return () => observer.disconnect();
   }, [stage]);
 
+  const handleSlideScroll = (e) => {
+    const scrollLeft = e.target.scrollLeft;
+    const itemWidth = e.target.clientWidth * 0.85; 
+    const index = Math.round(scrollLeft / itemWidth);
+    setActiveSlide(index);
+  };
+
   return (
     <>
       <title>El Bacán - Premium Cigars</title>
@@ -51,9 +66,10 @@ export default function ElBacanApp() {
       <style dangerouslySetInnerHTML={{ __html: `
         /* --- FONTS & BASE --- */
         @font-face { font-family: 'Arpona'; src: url('/fonts/Arpona-Regular.otf') format('truetype'); font-weight: normal; font-style: normal; }
+        @font-face { font-family: 'Arpona-Semibold'; src: url('/fonts/Arpona-Semibold.otf') format('truetype'); font-weight: bold; font-style: normal; }
         @font-face { font-family: 'GreatVibes'; src: url('/fonts/GreatVibes-Regular.ttf') format('truetype'); font-weight: normal; font-style: normal; }
+        html { scroll-snap-type: y mandatory; }
         html, body { margin: 0; padding: 0; overflow-x: hidden; font-family: 'Arpona', serif; background-color: #000000; }
-        .hero-section-wrapper { min-height: 100vh; display: flex; flex-direction: column; scroll-snap-align: start; scroll-snap-stop: always; }
 
         /* --- AGE VERIFICATION --- */
         @keyframes softZoomIn { 0% { opacity: 0; transform: scale(1); } 100% { opacity: 0.6; transform: scale(1.8); } }
@@ -81,38 +97,21 @@ export default function ElBacanApp() {
         .age-button { background: transparent; border: 1px solid #e6d5c3; color: #e6d5c3; font-family: 'Arpona', serif; font-size: 0.9rem; font-weight: bold; text-transform: uppercase; padding: 0.8rem 2.5rem; cursor: pointer; transition: all 0.3s ease; border-radius: 2px; }
         .age-button:hover { background: #e6d5c3; color: #1c1c1c; }
 
-        @media (max-width: 768px) {
-          @keyframes softZoomInMobile { 0% { opacity: 0; transform: scale(0.8); } 100% { opacity: 0.5; transform: scale(1.5); } }
-          @keyframes finalZoomMobile { 0% { opacity: 0.5; transform: scale(1.5); } 100% { opacity: 0; transform: scale(5); } }
-          @keyframes logoMoveToTopMobile { to { transform: translateY(-42vh) scale(0.5); } }
-          .age-page-background { transform-origin: center bottom; background-position: center bottom !important; animation: softZoomInMobile 2.5s ease-out forwards !important; }
-          .age-page-background.exit-anim { animation: finalZoomMobile 1.2s ease-in forwards !important; }
-          .age-logo-box.exit-anim { animation: logoMoveToTopMobile 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards !important; }
-          .age-content-wrapper { padding-top: 5vh !important; }
-        }
-
-        /* --- HOME PAGE --- */
+        /* --- HOME PAGE HERO --- */
         @keyframes pageFadeIn { 0% { opacity: 0; } 100% { opacity: 1; } }
         @keyframes bgFadeIn { 0% { opacity: 0; } 100% { opacity: 0.7; } }
         @keyframes floatSmoke { 0% { transform: scale(1) rotate(0deg); opacity: 0; } 50% { transform: scale(1.03) rotate(0.5deg); opacity: 0.85; } 100% { transform: scale(1.01) rotate(-0.5deg); opacity: 0; } }
         @keyframes navSlideDown { 0% { opacity: 0; transform: translateY(-20px); } 100% { opacity: 1; transform: translateY(0); } }
         @keyframes contentSlideUp { 0% { opacity: 0; transform: translateY(40px); } 100% { opacity: 1; transform: translateY(0); } }
 
-        .home-container { position: relative; min-height: 100vh; display: flex; flex-direction: column; background-color: #000000; animation: pageFadeIn 0.5s forwards; }
-        
+        .home-container { position: relative; display: flex; flex-direction: column; background-color: #000000; animation: pageFadeIn 0.5s forwards; }
         .hero-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100vh; background-image: url('${bgImagePath}'); background-size: cover; background-position: center top; z-index: 0; opacity: 0; animation: bgFadeIn 1.5s ease-out 0.2s forwards; }
         .smoke-wrapper { position: absolute; top: 0; left: 0; width: 100%; height: 100vh; z-index: 1; opacity: 0; animation: bgFadeIn 1.5s ease-out 0.2s forwards; overflow: hidden; }
         .smoke-layer { position: absolute; inset: 0; background-image: url('${smokeImagePath}'); background-size: cover; background-position: center top; transform-origin: center top; animation: floatSmoke 8s infinite ease-out; animation-delay: 1.5s; }
         .hero-gradient { position: absolute; top: 0; left: 0; width: 100%; height: 100vh; background: linear-gradient( to bottom, rgba(0, 0, 0, 0.9) 0%, transparent 25%, transparent 65%, #000000 100% ); z-index: 2; pointer-events: none; }
-
-        .content-layer {
-          position: relative; z-index: 10; display: flex; flex-direction: column; min-height: 100vh;
-          transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s ease;
-        }
+        .content-layer { position: relative; z-index: 10; display: flex; flex-direction: column; min-height: 100vh; transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s ease; }
         .content-layer.shifted { transform: translateX(-60%); opacity: 0; }
-        
-        .hero-section-wrapper { min-height: 100vh; display: flex; flex-direction: column; }
-
+        .hero-section-wrapper { min-height: 100vh; display: flex; flex-direction: column; scroll-snap-align: start; scroll-snap-stop: always; }
         .navbar { display: flex; justify-content: space-between; align-items: center; padding: 2rem 4rem; width: 100%; box-sizing: border-box; }
         .nav-links { display: flex; gap: 7rem; font-size: 20px; font-weight: normal; letter-spacing: 0.1em; text-transform: uppercase; flex: 1; opacity: 0; animation: navSlideDown 0.8s ease-out 0.5s forwards; }
         .nav-links.left { justify-content: flex-end; }
@@ -121,52 +120,38 @@ export default function ElBacanApp() {
         .nav-links a:hover { color: #89582F; }
         .nav-logo { flex: 0 0 auto; margin: 0 5rem; display: flex; justify-content: center; }
         .hamburger-menu { display: none; }
-
         .hero-content { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; flex: 1; padding: 2rem; text-align: center; box-sizing: border-box; }
         .text-wrapper { display: flex; flex-direction: column; align-items: center; max-width: 860px; }
         .hero-title { font-family: 'GreatVibes', cursive; font-size: 72px; font-weight: normal; color: #e6d5c3; margin-bottom: 0.5rem; line-height: 1; text-align: center; text-shadow: 0px 2px 8px rgba(0, 0, 0, 0.55); opacity: 0; animation: contentSlideUp 0.8s ease-out 0.8s forwards; }
         .hero-divider { width: 40%; height: 2px; background: rgba(181, 128, 69, 0.6); margin-top: 1rem; margin-bottom: 1.5rem; opacity: 0; animation: contentSlideUp 0.8s ease-out 1.0s forwards; text-shadow: 0px 4px 8px rgba(0, 0, 0, 0.55);}
         .hero-desc { font-family: 'Arpona', serif; font-size: 26px; font-weight: normal; color: rgba(230, 213, 195, 0.9); line-height: 1.4; width: 100%; margin-bottom: 2.5rem; text-align: center; opacity: 0; animation: contentSlideUp 0.8s ease-out 1.2s forwards; text-shadow: 0px 4px 8px rgba(0, 0, 0, 0.55);}
         .hero-buttons { display: flex; gap: 1.5rem; opacity: 0; animation: contentSlideUp 0.8s ease-out 1.4s forwards; }
-
         .btn { font-family: 'Arpona', serif; font-weight: bold; letter-spacing: 0.0em; text-transform: uppercase; font-size: 20px; width: 220px; padding: 12px 36px; box-sizing: border-box; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: all 0.3s; }
         .btn-primary { background-color: #e6d5c3; color: #1c1c1c; border: 1px solid #89582F; }
         .btn-primary:hover { background-color: #89582F; color: #FFFFFF;}
         .btn-secondary { background-color: transparent; color: #e6d5c3; border: 1px solid rgba(181, 128, 69, 0.6); }
         .btn-secondary:hover { background-color: rgba(181, 128, 69, 0.2); }
-
         .hero-footer { text-align: center; padding: 1rem 0 2rem 0; opacity: 0; animation: contentSlideUp 0.8s ease-out 1.6s forwards; }
         .hero-footer p { color: #b58045; font-style: italic; letter-spacing: 0.15em; font-size: 14px; margin: 0; }
 
         /* --- MOBILE MENU CSS --- */
-        .mobile-menu {
-          position: fixed; top: 0; right: 0; width: 100%; height: 100%; z-index: 100;
-          background-color: rgba(0, 0, 0, 0.8); backdrop-filter: blur(8px);
-          display: flex; flex-direction: column; align-items: center; padding: 1.5rem 2rem 2rem;
-          transform: translateX(100%); transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        }
+        .mobile-menu { position: fixed; top: 0; right: 0; width: 100%; height: 100%; z-index: 100; background-color: rgba(0, 0, 0, 0.8); backdrop-filter: blur(8px); display: flex; flex-direction: column; align-items: center; padding: 1.5rem 2rem 2rem; transform: translateX(100%); transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
         .mobile-menu.open { transform: translateX(0); }
-        
         .menu-close-btn { align-self: flex-end; background: none; border: none; color: #fff; font-size: 28px; cursor: pointer; padding: 0; }
         .menu-logo { margin: 1rem 0 3rem; }
-        
         .menu-nav { display: flex; flex-direction: column; width: 100%; max-width: 280px; gap: 0.5rem; }
         .menu-link { color: #fff; text-decoration: none; font-size: 18px; padding: 14px 24px; box-sizing: border-box; width: 100%; opacity: 0; transform: translateX(30px); transition: all 0.4s ease; }
         .mobile-menu.open .menu-link { opacity: 1; transform: translateX(0); }
         .menu-link.active { background-color: #89582F; border-radius: 30px; }
-
         .mobile-menu.open .menu-link:nth-child(1) { transition-delay: 0.1s; }
         .mobile-menu.open .menu-link:nth-child(2) { transition-delay: 0.2s; }
         .mobile-menu.open .menu-link:nth-child(3) { transition-delay: 0.3s; }
         .mobile-menu.open .menu-link:nth-child(4) { transition-delay: 0.4s; }
         .mobile-menu.open .menu-link:nth-child(5) { transition-delay: 0.5s; }
-
         .menu-footer-box { margin-top: auto; display: flex; flex-direction: column; align-items: center; gap: 1.5rem; width: 100%; opacity: 0; transform: translateY(20px); transition: all 0.5s ease 0.6s; }
         .mobile-menu.open .menu-footer-box { opacity: 1; transform: translateY(0); }
-
         .menu-socials { display: flex; gap: 1.5rem; }
         .menu-socials img { width: 28px; height: 28px; }
-
         .btn-whatsapp { display: flex; align-items: center; justify-content: center; gap: 10px; background-color: #89582F; color: #fff; text-decoration: none; border-radius: 30px; width: 100%; max-width: 280px; padding: 14px; font-size: 16px; border: none; cursor: pointer; }
         .btn-whatsapp img { width: 24px; height: 24px; }
         .menu-copyright { color: #fff; font-size: 12px; margin-top: 0.5rem; }
@@ -185,40 +170,129 @@ export default function ElBacanApp() {
           .btn { width: 156px; padding: 12px 0; font-size: 16px; margin-bottom: -1rem; }
         }
 
-        /* =========================================
-           3. CSS SHOWCASE SECTION (THE ANATOMY)
-           ========================================= */
-        .showcase-section { position: relative; width: 100%; min-height: 100vh; background: #000000; display: flex; align-items: center; justify-content: center; padding: 6rem 10%; box-sizing: border-box; z-index: 10; overflow: hidden; scroll-snap-align: start; scroll-snap-stop: always; }
-        .showcase-bg-glow { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60vw; height: 60vw; background: radial-gradient(circle, rgba(137,88,47,0.15) 0%, transparent 60%); z-index: 0; pointer-events: none; }
-        
-        /* Video Animasi & Efek Fade Out */
+        /* --- SHOWCASE SECTION (VIDEO & THE EL BACAN) --- */
+        .showcase-section { position: relative; width: 100%; min-height: 100vh; background: #000000; display: flex; align-items: center; justify-content: center; z-index: 10; overflow: hidden; scroll-snap-align: start; scroll-snap-stop: always; }
+        .showcase-top-gradient { position: absolute; top: 0; left: 0; width: 100%; height: 25vh; background: linear-gradient(to bottom, rgba(0,0,0,1) 0%, transparent 100%); z-index: 5; pointer-events: none; }
         .showcase-video-wrapper { position: absolute; inset: 0; display: flex; justify-content: center; align-items: center; z-index: 1; transition: opacity 1.5s ease-out; }
         .showcase-video-wrapper.fade-out { opacity: 0; pointer-events: none; }
-        .showcase-video { 
-          width: 100vw; 
-          height: 100vh; 
-          object-fit: cover; /* Biar video penuh proporsional */
-        }
-
-        /* Text Content & Efek Slide In (Awalnya sembunyi) */
-        .showcase-content { position: relative; z-index: 2; width: 100%; max-width: 800px; text-align: center; opacity: 0; transform: translateX(-80px); transition: all 1.2s cubic-bezier(0.25, 1, 0.5, 1); }
-        .showcase-content.visible { opacity: 1; transform: translateX(0); transition-delay: 0.5s; /* Delay sedikit setelah video fade out */ }
-        
-        .showcase-title { font-family: 'GreatVibes', cursive; font-size: 64px; color: #b58045; margin-bottom: 0.5rem; line-height: 1; text-shadow: 0px 2px 8px rgba(0,0,0,0.8); }
-        .showcase-subtitle { font-family: 'Arpona', serif; font-size: 28px; color: #e6d5c3; margin-bottom: 2rem; text-transform: uppercase; letter-spacing: 0.1em; }
-        .showcase-text { font-size: 20px; color: rgba(230,213,195,0.9); line-height: 1.6; margin-bottom: 3rem; }
-        
-        .anatomy-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 2rem; }
-        .anatomy-list li { display: flex; flex-direction: column; align-items: center; }
-        .anatomy-title { color: #b58045; font-weight: bold; text-transform: uppercase; letter-spacing: 0.15em; font-size: 16px; margin-bottom: 0.5rem; border-bottom: 1px solid rgba(181, 128, 69, 0.4); padding-bottom: 0.5rem; display: inline-block; }
-        .anatomy-desc { color: #e6d5c3; font-size: 16px; line-height: 1.5; max-width: 600px; }
+        .showcase-video { width: 100vw; height: 100vh; object-fit: cover; }
+        .new-showcase-content { position: absolute; inset: 0; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 4rem 8%; opacity: 0; pointer-events: none; transition: opacity 1.2s ease-in-out; background: linear-gradient(to bottom, #000000 0%, #89582f 100%); }
+        .new-showcase-content::before { content: ""; position: absolute; inset: 0; background-image: url('/images/texture.png'); background-size: cover; background-position: center; opacity: 0.2; z-index: -1; }
+        .new-showcase-content.visible { opacity: 1; pointer-events: auto; transition-delay: 0.5s; }
+        .new-section-title { font-family: 'Arpona-Semibold', serif; font-size: 48px; color: #ffffff; margin-bottom: 1rem; text-align: center; }
+        .new-section-divider { width: 64px; height: 6px; background-color: #89582f; margin: 0 auto 2rem auto; border-radius: 10px; }
+        .new-section-desc { font-family: 'Arpona', serif; font-size: 26px; color: #ffffff; text-align: center; max-width: 1100px; line-height: 1.5; margin-bottom: 4rem; }
+        .features-grid { display: flex; gap: 2rem; justify-content: center; width: 100%; max-width: 1200px; }
+        .feature-card { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 2rem 1.5rem; border-radius: 12px; border: 2px solid transparent; transition: border-color 0.3s; }
+        .feature-card:hover { border-color: #e6d5c3; }
+        .feature-img { width: 320px; height: 320px; object-fit: contain; margin-bottom: 1.5rem; border-radius: 50%; }
+        .feature-title { font-family: 'Arpona-Semibold', serif; font-size: 24px; color: #ffffff; margin-bottom: 0.8rem; }
+        .feature-desc { font-family: 'Arpona', serif; font-size: 16px; color: #e6d5c3; line-height: 1.5; }
+        .slider-dots { display: none; } 
 
         @media (max-width: 768px) {
-          .showcase-section { padding: 4rem 1.5rem; }
-          .showcase-title { font-size: 48px; }
-          .showcase-subtitle { font-size: 20px; }
-          .showcase-text { font-size: 16px; }
-          .showcase-video { max-width: 100%; transform: scale(1.2); }
+          .new-showcase-content { padding: 4rem 1.5rem; }
+          .new-section-title { font-size: 36px; }
+          .new-section-desc { font-size: 16px; margin-bottom: 2rem; }
+          .features-grid { flex-direction: row; overflow-x: auto; scroll-snap-type: x mandatory; justify-content: flex-start; gap: 1rem; padding-bottom: 1rem; width: 100vw; margin-left: -1.5rem; margin-right: -1.5rem; padding-left: 7.5vw; padding-right: 7.5vw; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+          .features-grid::-webkit-scrollbar { display: none; } 
+          .feature-card { min-width: 85vw; flex-shrink: 0; scroll-snap-align: center; padding: 1rem; }
+          .feature-card:hover { border-color: transparent; } 
+          .feature-img { width: 240px; height: 240px; }
+          .slider-dots { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 1rem; }
+          .slider-dot { height: 12px; border-radius: 12px; transition: all 0.3s ease; }
+          .slider-dot.active { width: 36px; background-color: #89582f; }
+          .slider-dot.inactive { width: 12px; background-color: #ffffff; }
+        }
+
+        /* --- OUR COLLECTION SECTION --- */
+        .collection-section { 
+          position: relative; 
+          width: 100%; 
+          min-height: 100vh; 
+          background-color: #fdfaf6; 
+          display: flex; 
+          flex-direction: column; 
+          align-items: center; 
+          justify-content: center;
+          padding: 6rem 5%; 
+          box-sizing: border-box; 
+          z-index: 10; 
+        }
+        
+        /* Background Texture 5% */
+        .collection-section::before { 
+          content: ""; 
+          position: absolute; 
+          inset: 0; 
+          background-image: url('/images/texture.png'); 
+          background-size: cover; 
+          background-position: center; 
+          opacity: 0.05; 
+          z-index: -1; 
+        }
+        
+        .collection-title { font-family: 'Arpona-Semibold', serif; font-size: 48px; color: #1c1c1c; margin-bottom: 1.5rem; text-align: center; }
+        .collection-desc { font-family: 'Arpona', serif; font-size: 20px; color: #1c1c1c; text-align: center; max-width: 900px; line-height: 1.6; margin-bottom: 3rem; }
+        
+        /* Tabs */
+        .collection-tabs { display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; margin-bottom: 3rem; }
+        .tab-btn { font-family: 'Arpona', serif; font-size: 16px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.05em; padding: 12px 32px; cursor: pointer; border: none; background: transparent; color: #1c1c1c; transition: all 0.3s ease; border-radius: 4px; }
+        .tab-btn:hover { color: #89582f; }
+        .tab-btn.active { background-color: #89582f; color: #ffffff; }
+
+        /* Card Grid */
+        .collection-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem; width: 100%; max-width: 1300px; }
+        
+        .product-card { background: #ffffff; border-radius: 8px; padding: 2rem 1.5rem; display: flex; flex-direction: column; align-items: center; box-shadow: 0 4px 20px rgba(0,0,0,0.05); position: relative; border: 1px solid #f0e9df; }
+        .card-badge { position: absolute; top: 1.5rem; right: -0.5rem; background-color: #c01b1b; color: #ffffff; font-family: 'Arpona-Semibold', serif; font-size: 11px; text-transform: uppercase; padding: 6px 12px; letter-spacing: 0.05em; z-index: 2; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .product-img-box { width: 100%; height: 260px; display: flex; justify-content: center; align-items: center; margin-bottom: 1.5rem; }
+        .product-img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        
+        .product-brand { font-family: 'Arpona', serif; font-size: 12px; color: #b58045; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem; }
+        .product-name { font-family: 'Arpona-Semibold', serif; font-size: 22px; color: #1c1c1c; text-align: center; margin-bottom: 1.5rem; min-height: 52px; display: flex; align-items: center; justify-content: center; }
+        
+        /* Specs */
+        .spec-row { display: flex; justify-content: center; gap: 0.5rem; width: 100%; margin-bottom: 0.8rem; flex-wrap: wrap; }
+        .spec-item { background: #f5f2eb; padding: 6px 10px; border-radius: 4px; display: flex; align-items: center; gap: 6px; font-family: 'Arpona', serif; font-size: 13px; color: #1c1c1c; white-space: nowrap; }
+        .spec-icon { width: 16px; height: 16px; fill: #89582f; }
+        
+        /* Dots Intensity */
+        .intensity-dots { display: flex; gap: 3px; }
+        .dot { width: 6px; height: 6px; border-radius: 50%; background-color: #d1c8bb; }
+        .dot.filled { background-color: #89582f; }
+
+        .btn-learn-more { margin-top: auto; width: 100%; background-color: #89582f; color: #ffffff; font-family: 'Arpona-Semibold', serif; font-size: 14px; text-transform: uppercase; padding: 14px 0; border: none; cursor: pointer; transition: background-color 0.3s ease; border-radius: 4px; }
+        .btn-learn-more:hover { background-color: #6a4322; }
+
+        @media (max-width: 1024px) {
+          .collection-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 768px) {
+          .collection-section { padding: 4rem 1.5rem; }
+          .collection-title { font-size: 36px; }
+          .collection-desc { font-size: 16px; }
+          .tab-btn { padding: 8px 16px; font-size: 14px; }
+          
+          /* Horizontal Slider untuk Grid Mobile */
+          .collection-grid { 
+            display: flex; 
+            flex-direction: row; 
+            overflow-x: auto; 
+            scroll-snap-type: x mandatory; 
+            gap: 1rem; 
+            padding-bottom: 2rem;
+            width: 100vw; 
+            margin-left: -1.5rem; 
+            margin-right: -1.5rem; 
+            padding-left: 1.5rem; 
+            padding-right: 1.5rem; 
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none; 
+          }
+          .collection-grid::-webkit-scrollbar { display: none; } 
+          .product-card { min-width: 80vw; flex-shrink: 0; scroll-snap-align: center; }
         }
       `}} />
 
@@ -249,6 +323,7 @@ export default function ElBacanApp() {
 
           <div className={`content-layer ${isMenuOpen ? 'shifted' : ''}`}>
             
+            {/* --- HERO SECTION --- */}
             <div className="hero-section-wrapper">
               <nav className="navbar">
                 <img src="/images/hamburger.svg" alt="Menu" className="hamburger-menu" onClick={() => setIsMenuOpen(true)} />
@@ -281,59 +356,135 @@ export default function ElBacanApp() {
               </div>
             </div>
 
-            {/* SECTION SHOWCASE / ANATOMY */}
+            {/* --- SHOWCASE / THE EL BACAN --- */}
             <section className="showcase-section">
-              <div className="showcase-bg-glow"></div>
+              <div className="showcase-top-gradient"></div>
               
-              {/* VIDEO LAYER - Fades out when isVideoFinished is true */}
               <div className={`showcase-video-wrapper ${isVideoFinished ? 'fade-out' : ''}`}>
                 <video 
                   ref={videoRef}
                   muted 
                   playsInline 
                   className="showcase-video"
-                  onEnded={() => setIsVideoFinished(true)} // Trigger saat video selesai
+                  onEnded={() => setIsVideoFinished(true)} 
                 >
                   <source src="/videos/cigar-animation.webm" type="video/webm" />
                   <source src="/videos/cigar-animation.mp4" type="video/mp4" />
                 </video>
               </div>
               
-              {/* TEXT LAYER - Slides in after video finishes */}
-              <div className={`showcase-content ${isVideoFinished ? 'visible' : ''}`}>
-                <h2 className="showcase-title">The Anatomy</h2>
-                <h3 className="showcase-subtitle">A Masterpiece Unveiled</h3>
-                <p className="showcase-text">
-                  Every El Bacán is a testament to the dedication of master blenders. A meticulous combination of the finest tobacco leaves, rolled into an unforgettable smoking experience.
+              <div className={`new-showcase-content ${isVideoFinished ? 'visible' : ''}`}>
+                <h2 className="new-section-title">The EL BACÁN</h2>
+                <div className="new-section-divider"></div>
+                <p className="new-section-desc">
+                  We do not just roll cigars, we engineer perfection. Every El Bacan cigar is a testament to rigorous quality control, ensuring absolute consistency, a flawless draw, and an even burn from the first light to the final ash.
                 </p>
                 
-                <ul className="anatomy-list">
-                  <li>
-                    <span className="anatomy-title">Capa (Wrapper)</span>
-                    <span className="anatomy-desc">Ecuadorian Habano Rosado — Flawless, oily, with a sophisticated touch of spice.</span>
-                  </li>
-                  <li>
-                    <span className="anatomy-title">Capote (Binder)</span>
-                    <span className="anatomy-desc">Nicaraguan Jalapa — Provides structure and a perfect balance of natural sweetness.</span>
-                  </li>
-                  <li>
-                    <span className="anatomy-title">Tripa (Filler)</span>
-                    <span className="anatomy-desc">Estelí & Condega — Deep complexity of earth, cedar, and dark chocolate.</span>
-                  </li>
-                </ul>
+                <div className="features-grid" onScroll={handleSlideScroll}>
+                  <div className="feature-card">
+                    <img src="/images/illustration-01.png" alt="Authentic Craftmanship" className="feature-img" />
+                    <h4 className="feature-title">Authentic Craftmanship</h4>
+                    <p className="feature-desc">Handmade in Nicaragua using traditional techniques that prioritize construction, consistency, and draw.</p>
+                  </div>
+                  
+                  <div className="feature-card">
+                    <img src="/images/illustration-02.png" alt="Elite Leaf Selection" className="feature-img" />
+                    <h4 className="feature-title">Elite Leaf Selection</h4>
+                    <p className="feature-desc">Selected and aged tobacco leaves, processed to achieve balance, smoothness, and reliable performance in every cigar.</p>
+                  </div>
+
+                  <div className="feature-card">
+                    <img src="/images/illustration-03.png" alt="Distinctive Flavor Profile" className="feature-img" />
+                    <h4 className="feature-title">Distinctive Flavor Profile</h4>
+                    <p className="feature-desc">A balanced smoking experience with evolving notes—from the first draw to a clean, consistent finish.</p>
+                  </div>
+                </div>
+
+                <div className="slider-dots">
+                  <div className={`slider-dot ${activeSlide === 0 ? 'active' : 'inactive'}`}></div>
+                  <div className={`slider-dot ${activeSlide === 1 ? 'active' : 'inactive'}`}></div>
+                  <div className={`slider-dot ${activeSlide === 2 ? 'active' : 'inactive'}`}></div>
+                </div>
+              </div>
+            </section>
+
+            {/* --- OUR COLLECTION --- */}
+            <section className="collection-section">
+              <h2 className="collection-title">Our Collection</h2>
+              <div className="new-section-divider"></div>
+              <p className="collection-desc">
+                Explore our three distinct blends through this interactive dashboard.
+              </p>
+
+              <div className="collection-tabs">
+                {['ORIGINAL', 'NEW', 'PREMIUM EDITION', 'BEST SELLER'].map((tab) => (
+                  <button 
+                    key={tab} 
+                    className={`tab-btn ${activeTab === tab ? 'active' : ''}`}
+                    onClick={() => setActiveTab(tab)}
+                  >
+                    {tab}
+                  </button>
+                ))}
               </div>
 
+              <div className="collection-grid">
+                {collectionData.map((cigar, index) => (
+                  <div className="product-card" key={index}>
+                    {cigar.badge && <div className="card-badge">{cigar.badge}</div>}
+                    
+                    <div className="product-img-box">
+                      {/* Pastikan lo siapin file gambarnya bro: /images/box-churchill.png dsb */}
+                      <img src={cigar.image} alt={cigar.name} className="product-img" />
+                    </div>
+                    
+                    <span className="product-brand">ELBACAN</span>
+                    <h3 className="product-name">{cigar.name}</h3>
+                    
+                    <div className="spec-row">
+                      <div className="spec-item">
+                        <svg className="spec-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>
+                        {cigar.ring}
+                      </div>
+                      <div className="spec-item">
+                        <svg className="spec-icon" viewBox="0 0 24 24"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 10H3V8h2v4h2V8h2v4h2V8h2v4h2V8h2v4h2V8h2v10z"/></svg>
+                        {cigar.length}
+                      </div>
+                      <div className="spec-item">
+                        <svg className="spec-icon" viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+                        {cigar.time}
+                      </div>
+                    </div>
+
+                    <div className="spec-row" style={{marginBottom: '1.5rem'}}>
+                      <div className="spec-item">
+                        <svg className="spec-icon" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+                        <div className="intensity-dots">
+                          {[1, 2, 3, 4, 5].map(num => (
+                            <span key={num} className={`dot ${num <= cigar.intensity ? 'filled' : ''}`}></span>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="spec-item">
+                        <svg className="spec-icon" viewBox="0 0 24 24"><path d="M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66l.95-2.3c.48.17.96.3 1.34.3c3.14 0 6.13-2.04 8.78-5.32c3.55-4.41 5.12-9.67 5.22-10.02L20.89 4C20.89 4 19.34 7.42 17 8zM10.87 15.65c-1.39-1.07-2.67-2.64-3.3-4.32l1.64-2.82c1.77 2.19 3.53 3.96 5.22 4.97c-1.01 1.05-2.28 1.83-3.56 2.17z"/></svg>
+                        {cigar.wrapper}
+                      </div>
+                    </div>
+
+                    <button className="btn-learn-more">LEARN MORE</button>
+                  </div>
+                ))}
+              </div>
             </section>
             
           </div>
 
+          {/* --- MOBILE MENU OVERLAY --- */}
           <div className={`mobile-menu ${isMenuOpen ? 'open' : ''}`}>
             <button className="menu-close-btn" onClick={() => setIsMenuOpen(false)}>&#10005;</button>
-            
             <div className="menu-logo">
               <Image src="/images/elbacan-logo-v2.svg" alt="El Bacán Logo" width={140} height={126} priority />
             </div>
-
             <nav className="menu-nav">
               <a href="#" className="menu-link active">Home</a>
               <a href="#" className="menu-link">Collection</a>
@@ -341,7 +492,6 @@ export default function ElBacanApp() {
               <a href="#" className="menu-link">Art of Aging</a>
               <a href="#" className="menu-link">Wholesale</a>
             </nav>
-
             <div className="menu-footer-box">
               <div className="menu-socials">
                 <img src="/images/instagram.svg" alt="Instagram" />
