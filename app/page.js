@@ -8,21 +8,46 @@ export default function ElBacanApp() {
   const [isMenuOpen, setIsMenuOpen] = useState(false); 
   const [isVideoFinished, setIsVideoFinished] = useState(false); 
   const [activeSlide, setActiveSlide] = useState(0); 
-  const [activeTab, setActiveTab] = useState('ORIGINAL'); // State untuk tab Collection
+  const [activeTab, setActiveTab] = useState('ORIGINAL'); 
+  const [activeWrapper, setActiveWrapper] = useState(0); 
   
   const videoRef = useRef(null);
+  const wrapperSliderRef = useRef(null); 
 
   const bgImagePath = "/images/hero-bg-angel2c.jpg"; 
   const smokeImagePath = "/images/smoke-effect.png";
   const doorImagePath = "/images/elbacan-door.jpg";
   const logoPath = "/images/elbacan-logo-v2.svg";
 
-  // Data dummy untuk Our Collection
   const collectionData = [
     { name: 'CHURCHILL', ring: '48', length: '7"', time: '30-45min', intensity: 3, wrapper: 'Habano', image: '/images/box-churchill.png', badge: null },
     { name: 'DOUBLE CORONA', ring: '52', length: '8"', time: '30-45min', intensity: 4, wrapper: 'Habano', image: '/images/box-double-corona.png', badge: 'BEST SELLER' },
     { name: 'TORPEDO', ring: '52', length: '6 ½"', time: '40min', intensity: 4, wrapper: 'Habano', image: '/images/box-torpedo.png', badge: null },
     { name: 'TORO', ring: '52', length: '6"', time: '30-45min', intensity: 2, wrapper: 'Habano', image: '/images/box-toro.png', badge: null },
+  ];
+
+  const wrapperData = [
+    {
+      subtitle: 'SMOOTH & CREAMY',
+      title: 'The Connecticut Reserve',
+      desc: 'A flawless, shade-grown leaf offering a mild yet flavorful profile. Expect notes of toasted almond, cedar, and a hint of vanilla with a creamy, buttery finish.',
+      image: '/images/wrapper-connecticut.png', 
+      bgColor: '#A67B36'
+    },
+    {
+      subtitle: 'BALANCED & COMPLEX',
+      title: 'The Habano Heritage',
+      desc: 'Sun-grown and rich in oils, this Rosado wrapper delivers a medium-to-full body. It presents an intricate dance of roasted coffee, earth, and a signature peppery spice.',
+      image: '/images/wrapper-habano.png', 
+      bgColor: '#5B362A'
+    },
+    {
+      subtitle: 'BOLD & RICH',
+      title: 'The Maduro Privado',
+      desc: 'A naturally fermented, dark and oily wrapper. It yields a robust, sweet, and savory experience characterized by dark chocolate, espresso, and black cherry nuances.',
+      image: '/images/wrapper-maduro.png', 
+      bgColor: '#312921'
+    }
   ];
 
   const handleYesClick = () => {
@@ -59,6 +84,24 @@ export default function ElBacanApp() {
     setActiveSlide(index);
   };
 
+  const handleWrapperScroll = (e) => {
+    const scrollLeft = e.target.scrollLeft;
+    const itemWidth = e.target.clientWidth * 0.85; 
+    const index = Math.round(scrollLeft / itemWidth);
+    setActiveWrapper(index);
+  };
+
+  const handleWrapperArrowClick = (direction) => {
+    if (wrapperSliderRef.current) {
+      const scrollAmount = wrapperSliderRef.current.clientWidth * 0.85;
+      if (direction === 'left') {
+        wrapperSliderRef.current.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+      } else {
+        wrapperSliderRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+      }
+    }
+  };
+
   return (
     <>
       <title>El Bacán - Premium Cigars</title>
@@ -68,7 +111,7 @@ export default function ElBacanApp() {
         @font-face { font-family: 'Arpona'; src: url('/fonts/Arpona-Regular.otf') format('truetype'); font-weight: normal; font-style: normal; }
         @font-face { font-family: 'Arpona-Semibold'; src: url('/fonts/Arpona-SemiBold.otf') format('truetype'); font-weight: bold; font-style: normal; }
         @font-face { font-family: 'GreatVibes'; src: url('/fonts/GreatVibes-Regular.ttf') format('truetype'); font-weight: normal; font-style: normal; }
-        html { scroll-snap-type: y mandatory; }
+        
         html, body { margin: 0; padding: 0; overflow-x: hidden; font-family: 'Arpona', serif; background-color: #000000; }
 
         /* --- AGE VERIFICATION --- */
@@ -109,9 +152,12 @@ export default function ElBacanApp() {
         .smoke-wrapper { position: absolute; top: 0; left: 0; width: 100%; height: 100vh; z-index: 1; opacity: 0; animation: bgFadeIn 1.5s ease-out 0.2s forwards; overflow: hidden; }
         .smoke-layer { position: absolute; inset: 0; background-image: url('${smokeImagePath}'); background-size: cover; background-position: center top; transform-origin: center top; animation: floatSmoke 8s infinite ease-out; animation-delay: 1.5s; }
         .hero-gradient { position: absolute; top: 0; left: 0; width: 100%; height: 100vh; background: linear-gradient( to bottom, rgba(0, 0, 0, 0.9) 0%, transparent 25%, transparent 65%, #000000 100% ); z-index: 2; pointer-events: none; }
+        
         .content-layer { position: relative; z-index: 10; display: flex; flex-direction: column; min-height: 100vh; transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s ease; }
         .content-layer.shifted { transform: translateX(-60%); opacity: 0; }
-        .hero-section-wrapper { min-height: 100vh; display: flex; flex-direction: column; scroll-snap-align: start; scroll-snap-stop: always; }
+        
+        .hero-section-wrapper { min-height: 100vh; display: flex; flex-direction: column; }
+        
         .navbar { display: flex; justify-content: space-between; align-items: center; padding: 2rem 4rem; width: 100%; box-sizing: border-box; }
         .nav-links { display: flex; gap: 7rem; font-size: 20px; font-weight: normal; letter-spacing: 0.1em; text-transform: uppercase; flex: 1; opacity: 0; animation: navSlideDown 0.8s ease-out 0.5s forwards; }
         .nav-links.left { justify-content: flex-end; }
@@ -171,7 +217,7 @@ export default function ElBacanApp() {
         }
 
         /* --- SHOWCASE SECTION (VIDEO & THE EL BACAN) --- */
-        .showcase-section { position: relative; width: 100%; min-height: 100vh; background: #000000; display: flex; align-items: center; justify-content: center; z-index: 10; overflow: hidden; scroll-snap-align: start; scroll-snap-stop: always; }
+        .showcase-section { position: relative; width: 100%; min-height: 100vh; background: #000000; display: flex; align-items: center; justify-content: center; z-index: 10; overflow: hidden; }
         .showcase-top-gradient { position: absolute; top: 0; left: 0; width: 100%; height: 25vh; background: linear-gradient(to bottom, rgba(0,0,0,1) 0%, transparent 100%); z-index: 5; pointer-events: none; }
         .showcase-video-wrapper { position: absolute; inset: 0; display: flex; justify-content: center; align-items: center; z-index: 1; transition: opacity 1.5s ease-out; }
         .showcase-video-wrapper.fade-out { opacity: 0; pointer-events: none; }
@@ -181,7 +227,7 @@ export default function ElBacanApp() {
         .new-showcase-content.visible { opacity: 1; pointer-events: auto; transition-delay: 0.5s; }
         .new-section-title { font-family: 'Arpona-Semibold', serif; font-size: 48px; color: #ffffff; margin-bottom: 1rem; text-align: center; }
         .new-section-divider { width: 64px; height: 6px; background-color: #89582f; margin: 0 auto 2rem auto; border-radius: 10px; }
-        .new-section-desc { font-family: 'Arpona', serif; font-size: 26px; color: #ffffff; text-align: center; max-width: 1100px; line-height: 1.5; margin-bottom: 4rem; }
+        .new-section-desc { font-family: 'Arpona', serif; font-size: 26px; color: #ffffff; text-align: center; max-width: 1100px; margin: 0 auto 4rem auto; line-height: 1.5; }
         .features-grid { display: flex; gap: 2rem; justify-content: center; width: 100%; max-width: 1200px; }
         .feature-card { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 2rem 1.5rem; border-radius: 12px; border: 2px solid transparent; transition: border-color 0.3s; }
         .feature-card:hover { border-color: #e6d5c3; }
@@ -205,95 +251,151 @@ export default function ElBacanApp() {
           .slider-dot.inactive { width: 12px; background-color: #ffffff; }
         }
 
+        /* --- THE WRAPPER SECTION --- */
+        .wrapper-section { position: relative; width: 100%; min-height: 100vh; background: #000000; display: flex; flex-direction: column; align-items: center; padding: 6rem 8% 0 8%; box-sizing: border-box; z-index: 10; overflow: hidden; }
+        .wrapper-header { text-align: center; margin-bottom: 4rem; width: 100%; z-index: 2; }
+        .wrapper-desc { font-family: 'Arpona', serif; font-size: 18px; color: #ffffff; text-align: center; max-width: 900px; margin: 0 auto; line-height: 1.6; }
+        
+        .wrapper-content-box { display: flex; width: 100%; max-width: 1200px; gap: 4rem; align-items: stretch; justify-content: center; z-index: 2; flex: 1; }
+        
+        .wrapper-slider-container { position: relative; width: 100%; display: flex; justify-content: center; flex: 1; max-width: 450px; align-self: center; margin-bottom: 6rem; }
+        .wrapper-accordion { width: 100%; display: flex; flex-direction: column; border: 1px solid #1c1c1c; }
+        .accordion-item { padding: 1.5rem 2rem; background: #141414; border-bottom: 1px solid #0a0a0a; cursor: pointer; transition: background-color 0.4s ease; overflow: hidden; }
+        .accordion-item:last-child { border-bottom: none; }
+        
+        .acc-subtitle { font-family: 'Arpona', serif; font-size: 11px; color: #e6d5c3; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.5rem; display: block; opacity: 0.8; }
+        .accordion-item.active .acc-subtitle { color: #fdfaf6; opacity: 0.9; }
+        .acc-title { font-family: 'Arpona-Semibold', serif; font-size: 22px; color: #ffffff; margin: 0; }
+        
+        .acc-desc { max-height: 0; opacity: 0; font-family: 'Arpona', serif; font-size: 15px; color: #fdfaf6; line-height: 1.6; transition: all 0.4s ease; margin-top: 0; }
+        .accordion-item.active .acc-desc { max-height: 200px; opacity: 1; margin-top: 1.2rem; }
+        
+        .wrapper-img-container { flex: 1; display: flex; justify-content: center; align-items: flex-end; position: relative; }
+        
+        .wrapper-img { position: absolute; bottom: 0; width: 100%; max-width: 624px; object-fit: contain; opacity: 0; transition: opacity 0.8s ease-in-out; display: block; }
+        .wrapper-img.active { opacity: 1; z-index: 2; }
+        .wrapper-img.placeholder { position: relative; opacity: 0; pointer-events: none; z-index: 0; }
+        
+        .slider-arrow-wrapper { display: none; }
+
+        @media (max-width: 768px) {
+          .wrapper-section { padding: 4rem 1.5rem 0; }
+          .wrapper-content-box { flex-direction: column-reverse; gap: 0; width: 100%; } 
+          .wrapper-desc { font-size: 16px; }
+          
+          .wrapper-img { max-width: 90%; }
+          .wrapper-img-container { margin-bottom: 0; z-index: 1; }
+          
+          .wrapper-slider-container { max-width: 100%; align-self: center; margin-bottom: 0; }
+          
+          .slider-arrow-wrapper { display: flex; position: absolute; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.5); font-size: 32px; z-index: 10; cursor: pointer; padding: 10px; }
+          .slider-arrow-wrapper.left { left: 5px; }
+          .slider-arrow-wrapper.right { right: 5px; }
+
+          .wrapper-accordion { flex-direction: row; overflow-x: auto; scroll-snap-type: x mandatory; width: 100vw; margin-left: -1.5rem; margin-right: -1.5rem; padding-left: 7.5vw; padding-right: 7.5vw; gap: 1rem; border: none; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+          .wrapper-accordion::-webkit-scrollbar { display: none; } 
+          
+          .accordion-item { width: 85vw; min-width: 85vw; max-width: 85vw; flex-shrink: 0; scroll-snap-align: center; border-radius: 8px; border: 1px solid #2a2a2a; white-space: normal; word-wrap: break-word; }
+          
+          .acc-desc { max-height: 500px; opacity: 1; margin-top: 1.2rem; }
+          .acc-subtitle { color: #fdfaf6; opacity: 0.9; }
+        }
+
         /* --- OUR COLLECTION SECTION --- */
-        .collection-section { 
-          position: relative; 
-          width: 100%; 
-          min-height: 100vh; 
-          background-color: #fdfaf6; 
-          display: flex; 
-          flex-direction: column; 
-          align-items: center; 
-          justify-content: center;
-          padding: 6rem 5%; 
-          box-sizing: border-box; 
-          z-index: 10; 
-        }
-        
-        /* Background Texture 5% */
-        .collection-section::before { 
-          content: ""; 
-          position: absolute; 
-          inset: 0; 
-          background-image: url('/images/texture.png'); 
-          background-size: cover; 
-          background-position: center; 
-          opacity: 0.05; 
-          z-index: -1; 
-        }
-        
+        .collection-section { position: relative; width: 100%; min-height: 100vh; background-color: #fdfaf6; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 6rem 5%; box-sizing: border-box; z-index: 10; }
+        .collection-section::before { content: ""; position: absolute; inset: 0; background-image: url('/images/texture.png'); background-size: cover; background-position: center; opacity: 0.05; z-index: -1; }
         .collection-title { font-family: 'Arpona-Semibold', serif; font-size: 48px; color: #1c1c1c; margin-bottom: 1.5rem; text-align: center; }
         .collection-desc { font-family: 'Arpona', serif; font-size: 20px; color: #1c1c1c; text-align: center; max-width: 900px; line-height: 1.6; margin-bottom: 3rem; }
-        
-        /* Tabs */
         .collection-tabs { display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; margin-bottom: 3rem; }
         .tab-btn { font-family: 'Arpona', serif; font-size: 16px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.05em; padding: 12px 32px; cursor: pointer; border: none; background: transparent; color: #1c1c1c; transition: all 0.3s ease; border-radius: 4px; }
         .tab-btn:hover { color: #89582f; }
         .tab-btn.active { background-color: #89582f; color: #ffffff; }
-
-        /* Card Grid */
         .collection-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem; width: 100%; max-width: 1300px; }
-        
         .product-card { background: #ffffff; border-radius: 8px; padding: 2rem 1.5rem; display: flex; flex-direction: column; align-items: center; box-shadow: 0 4px 20px rgba(0,0,0,0.05); position: relative; border: 1px solid #f0e9df; }
         .card-badge { position: absolute; top: 1.5rem; right: -0.5rem; background-color: #c01b1b; color: #ffffff; font-family: 'Arpona-Semibold', serif; font-size: 11px; text-transform: uppercase; padding: 6px 12px; letter-spacing: 0.05em; z-index: 2; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         .product-img-box { width: 100%; height: 260px; display: flex; justify-content: center; align-items: center; margin-bottom: 1.5rem; }
         .product-img { max-width: 100%; max-height: 100%; object-fit: contain; }
-        
         .product-brand { font-family: 'Arpona', serif; font-size: 12px; color: #b58045; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem; }
         .product-name { font-family: 'Arpona-Semibold', serif; font-size: 22px; color: #1c1c1c; text-align: center; margin-bottom: 1.5rem; min-height: 52px; display: flex; align-items: center; justify-content: center; }
-        
-        /* Specs */
         .spec-row { display: flex; justify-content: center; gap: 0.5rem; width: 100%; margin-bottom: 0.8rem; flex-wrap: wrap; }
         .spec-item { background: #f5f2eb; padding: 6px 10px; border-radius: 4px; display: flex; align-items: center; gap: 6px; font-family: 'Arpona', serif; font-size: 13px; color: #1c1c1c; white-space: nowrap; }
         .spec-icon { width: 16px; height: 16px; fill: #89582f; }
-        
-        /* Dots Intensity */
         .intensity-dots { display: flex; gap: 3px; }
         .dot { width: 6px; height: 6px; border-radius: 50%; background-color: #d1c8bb; }
         .dot.filled { background-color: #89582f; }
-
         .btn-learn-more { margin-top: auto; width: 100%; background-color: #89582f; color: #ffffff; font-family: 'Arpona-Semibold', serif; font-size: 14px; text-transform: uppercase; padding: 14px 0; border: none; cursor: pointer; transition: background-color 0.3s ease; border-radius: 4px; }
         .btn-learn-more:hover { background-color: #6a4322; }
 
         @media (max-width: 1024px) {
           .collection-grid { grid-template-columns: repeat(2, 1fr); }
         }
-
         @media (max-width: 768px) {
-          .collection-section { padding: 4rem 1.5rem; }
+          .collection-section { padding: 4rem 1.5rem; justify-content: flex-start; }
           .collection-title { font-size: 36px; }
-          .collection-desc { font-size: 16px; }
+          .collection-desc { font-size: 16px; margin-bottom: 2rem; }
+          .collection-tabs { margin-bottom: 2rem; }
           .tab-btn { padding: 8px 16px; font-size: 14px; }
-          
-          /* Horizontal Slider untuk Grid Mobile */
-          .collection-grid { 
-            display: flex; 
-            flex-direction: row; 
-            overflow-x: auto; 
-            scroll-snap-type: x mandatory; 
-            gap: 1rem; 
-            padding-bottom: 2rem;
-            width: 100vw; 
-            margin-left: -1.5rem; 
-            margin-right: -1.5rem; 
-            padding-left: 1.5rem; 
-            padding-right: 1.5rem; 
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none; 
-          }
+          .collection-grid { display: flex; flex-direction: row; overflow-x: auto; scroll-snap-type: x mandatory; gap: 1rem; padding-bottom: 2rem; width: 100vw; margin-left: -1.5rem; margin-right: -1.5rem; padding-left: 1.5rem; padding-right: 1.5rem; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
           .collection-grid::-webkit-scrollbar { display: none; } 
           .product-card { min-width: 80vw; flex-shrink: 0; scroll-snap-align: center; }
+          .product-img-box { height: 200px; }
         }
+
+        /* --- B2B / WHOLESALE SECTION --- */
+        .wholesale-section { 
+          position: relative; width: 100%; padding: 6rem 8%; box-sizing: border-box; 
+          background-color: #1f1f1f; 
+          background-image: repeating-linear-gradient(45deg, #1c1c1c, #1c1c1c 8px, #1a1a1a 8px, #1a1a1a 16px);
+          display: flex; justify-content: center; z-index: 10;
+        }
+        .wholesale-content { display: flex; flex-direction: row; max-width: 1200px; width: 100%; gap: 5rem; align-items: center; }
+        
+        .wholesale-text { flex: 1; display: flex; flex-direction: column; }
+        .ws-title { font-family: 'Arpona-Semibold', serif; font-size: 40px; color: #ffffff; margin: 0 0 1rem 0; line-height: 1.2; }
+        .ws-divider { width: 64px; height: 4px; background-color: #89582f; margin-bottom: 2rem; border-radius: 4px; }
+        .ws-desc { font-family: 'Arpona', serif; font-size: 16px; color: #cccccc; line-height: 1.6; margin-bottom: 1.5rem; }
+        
+        .ws-contact-list { display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem; }
+        .ws-contact-item { display: flex; align-items: center; gap: 10px; font-family: 'Arpona', serif; font-size: 14px; color: #b58045; letter-spacing: 0.05em; text-transform: uppercase; }
+        .ws-icon { width: 20px; height: 20px; fill: #b58045; }
+
+        .wholesale-form-box { flex: 1; background: #ffffff; padding: 3rem; border-radius: 2px; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .form-title { font-family: 'Arpona-Semibold', serif; font-size: 24px; color: #1c1c1c; margin: 0 0 2rem 0; text-align: center; }
+        
+        .ws-input { 
+          width: 100%; border: none; border-bottom: 1px solid #e0e0e0; padding: 12px 0; 
+          font-family: 'Arpona', serif; font-size: 12px; color: #1c1c1c; margin-bottom: 1.5rem; 
+          background: transparent; outline: none; transition: border-color 0.3s;
+          text-transform: uppercase; letter-spacing: 0.05em;
+        }
+        .ws-input::placeholder { color: #999999; }
+        .ws-input:focus { border-bottom-color: #89582f; }
+        .input-row { display: flex; gap: 2rem; width: 100%; }
+        
+        .btn-wholesale { 
+          width: 100%; background-color: #2a2a2a; color: #ffffff; font-family: 'Arpona', serif; 
+          font-size: 14px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.05em; 
+          padding: 16px 0; border: none; cursor: pointer; transition: background-color 0.3s ease; 
+          margin-top: 1rem; border-radius: 2px;
+        }
+        .btn-wholesale:hover { background-color: #89582f; }
+
+        @media (max-width: 768px) {
+          .wholesale-section { padding: 4rem 1.5rem; }
+          .wholesale-content { flex-direction: column; gap: 3rem; }
+          .ws-title { font-size: 32px; }
+          .wholesale-form-box { padding: 2rem 1.5rem; width: 100%; box-sizing: border-box; }
+          .input-row { flex-direction: column; gap: 0; }
+        }
+
+        /* --- FOOTER --- */
+        .footer { 
+          width: 100%; background-color: #0a0a0a; padding: 2rem 1.5rem; 
+          display: flex; flex-direction: column; align-items: center; justify-content: center; 
+          text-align: center; box-sizing: border-box; z-index: 10; position: relative;
+        }
+        .footer-title { font-family: 'Arpona-Semibold', serif; font-size: 14px; color: #e6d5c3; letter-spacing: 0.1em; text-transform: uppercase; margin: 0 0 0.5rem 0; }
+        .footer-copy { font-family: 'Arpona', serif; font-size: 12px; color: #888888; margin: 0; }
       `}} />
 
       {stage !== 'home' && (
@@ -328,11 +430,9 @@ export default function ElBacanApp() {
               <nav className="navbar">
                 <img src="/images/hamburger.svg" alt="Menu" className="hamburger-menu" onClick={() => setIsMenuOpen(true)} />
                 <div className="nav-links left"><a href="#">Collection</a><a href="#">Discover</a></div>
-                
                 <div className="nav-logo">
                   <Image src="/images/elbacan-logo-v2.svg" alt="El Bacán Logo" width={200} height={180} priority />
                 </div>
-
                 <div className="nav-links right"><a href="#">Art of Aging</a><a href="#">Wholesale</a></div>
               </nav>
 
@@ -344,7 +444,6 @@ export default function ElBacanApp() {
                     Premium handmade cigars from Nicaragua. Consistent in construction, refined in character, and made for those who expect more.
                   </p>
                 </div>
-                
                 <div className="hero-buttons">
                   <button className="btn btn-primary">Collection</button>
                   <button className="btn btn-secondary">Discover</button>
@@ -386,13 +485,11 @@ export default function ElBacanApp() {
                     <h4 className="feature-title">Authentic Craftmanship</h4>
                     <p className="feature-desc">Handmade in Nicaragua using traditional techniques that prioritize construction, consistency, and draw.</p>
                   </div>
-                  
                   <div className="feature-card">
                     <img src="/images/illustration-02.png" alt="Elite Leaf Selection" className="feature-img" />
                     <h4 className="feature-title">Elite Leaf Selection</h4>
                     <p className="feature-desc">Selected and aged tobacco leaves, processed to achieve balance, smoothness, and reliable performance in every cigar.</p>
                   </div>
-
                   <div className="feature-card">
                     <img src="/images/illustration-03.png" alt="Distinctive Flavor Profile" className="feature-img" />
                     <h4 className="feature-title">Distinctive Flavor Profile</h4>
@@ -408,12 +505,60 @@ export default function ElBacanApp() {
               </div>
             </section>
 
+            {/* --- NEW SECTION: THE WRAPPER --- */}
+            <section className="wrapper-section">
+              <div className="wrapper-header">
+                <h2 className="new-section-title">The Wrapper</h2>
+                <div className="new-section-divider"></div>
+                <p className="wrapper-desc">
+                  The wrapper is the soul of the cigar, dictating up to 70% of its final flavor profile. Explore the distinct character, textures, and complex tasting notes of our meticulously aged leaves.
+                </p>
+              </div>
+
+              <div className="wrapper-content-box">
+                <div className="wrapper-slider-container">
+                  <div className="slider-arrow-wrapper left" onClick={() => handleWrapperArrowClick('left')}>&#10094;</div>
+                  
+                  <div className="wrapper-accordion" onScroll={handleWrapperScroll} ref={wrapperSliderRef}>
+                    {wrapperData.map((item, idx) => (
+                      <div 
+                        key={idx} 
+                        className={`accordion-item ${activeWrapper === idx ? 'active' : ''}`}
+                        onClick={() => setActiveWrapper(idx)}
+                        style={{ backgroundColor: activeWrapper === idx ? item.bgColor : '#141414' }}
+                      >
+                        <span className="acc-subtitle">{item.subtitle}</span>
+                        <h3 className="acc-title">{item.title}</h3>
+                        <div className="acc-desc">
+                          <p>{item.desc}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  <div className="slider-arrow-wrapper right" onClick={() => handleWrapperArrowClick('right')}>&#10095;</div>
+                </div>
+
+                <div className="wrapper-img-container">
+                  <img src={wrapperData[0].image} className="wrapper-img placeholder" alt="Placeholder" />
+                  
+                  {wrapperData.map((item, idx) => (
+                    <img 
+                      key={idx}
+                      src={item.image} 
+                      alt={item.title} 
+                      className={`wrapper-img ${activeWrapper === idx ? 'active' : ''}`} 
+                    />
+                  ))}
+                </div>
+              </div>
+            </section>
+
             {/* --- OUR COLLECTION --- */}
             <section className="collection-section">
               <h2 className="collection-title">Our Collection</h2>
-              <div className="new-section-divider"></div>
               <p className="collection-desc">
-                Explore our three distinct blends through this interactive dashboard.
+                Explore our three distinct blends through this interactive dashboard. Select a collection below to reveal its specific tasting notes, wrapper details, and a visual representation of its flavor profile.
               </p>
 
               <div className="collection-tabs">
@@ -432,12 +577,9 @@ export default function ElBacanApp() {
                 {collectionData.map((cigar, index) => (
                   <div className="product-card" key={index}>
                     {cigar.badge && <div className="card-badge">{cigar.badge}</div>}
-                    
                     <div className="product-img-box">
-                      {/* Pastikan lo siapin file gambarnya bro: /images/box-churchill.png dsb */}
                       <img src={cigar.image} alt={cigar.name} className="product-img" />
                     </div>
-                    
                     <span className="product-brand">ELBACAN</span>
                     <h3 className="product-name">{cigar.name}</h3>
                     
@@ -470,12 +612,60 @@ export default function ElBacanApp() {
                         {cigar.wrapper}
                       </div>
                     </div>
-
                     <button className="btn-learn-more">LEARN MORE</button>
                   </div>
                 ))}
               </div>
             </section>
+
+            {/* --- B2B DISTRIBUTION / WHOLESALE SECTION --- */}
+            <section className="wholesale-section">
+              <div className="wholesale-content">
+                
+                <div className="wholesale-text">
+                  <h2 className="ws-title">Elevate Your Humidor:<br/>B2B Distribution</h2>
+                  <div className="ws-divider"></div>
+                  <p className="ws-desc">
+                    This section is dedicated to our wholesale partners. Join the ranks of the nation's most elite tobacconists. El Bacan is currently expanding its B2B distribution network to select, high-end cigar lounges and premium retailers across the USA, with a special focus on the <strong>luxury lifestyle</strong> market in Miami.
+                  </p>
+                  <p className="ws-desc">
+                    Partnering with El Bacan means offering your clientele an exclusive, highly sought-after product backed by aggressive marketing support and uncompromising inventory consistency.
+                  </p>
+                  
+                  <div className="ws-contact-list">
+                    <div className="ws-contact-item">
+                      <svg className="ws-icon" viewBox="0 0 24 24"><path d="M20 15.5c-1.25 0-2.45-.2-3.57-.57a1.02 1.02 0 0 0-1.02.24l-2.2 2.2a15.045 15.045 0 0 1-6.59-6.59l2.2-2.21a.96.96 0 0 0 .25-1A11.36 11.36 0 0 1 8.5 4c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1c0 9.39 7.61 17 17 17c.55 0 1-.45 1-1v-3.5c0-.55-.45-1-1-1z"/></svg>
+                      1-800-EL-BACAN
+                    </div>
+                    <div className="ws-contact-item">
+                      <svg className="ws-icon" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5l-8-5V6l8 5l8-5v2z"/></svg>
+                      WHOLESALE@ELBACANCIGARS.COM
+                    </div>
+                  </div>
+                </div>
+
+                <div className="wholesale-form-box">
+                  <h3 className="form-title">Apply for a Wholesale Account</h3>
+                  <input type="text" className="ws-input" placeholder="FULL NAME" />
+                  <input type="text" className="ws-input" placeholder="BUSINESS NAME" />
+                  
+                  <div className="input-row">
+                    <input type="text" className="ws-input" placeholder="TAX ID / EIN" />
+                    <input type="tel" className="ws-input" placeholder="PHONE" />
+                  </div>
+                  
+                  <input type="email" className="ws-input" placeholder="EMAIL" />
+                  <button className="btn-wholesale">REQUEST WHOLESALE PRICING</button>
+                </div>
+
+              </div>
+            </section>
+
+            {/* --- FOOTER --- */}
+            <footer className="footer">
+              <h4 className="footer-title">EL BACAN CIGARS</h4>
+              <p className="footer-copy">© 2026 El Bacan. La Tradición Se Fuma Con Estilo. All Rights Reserved.</p>
+            </footer>
             
           </div>
 
