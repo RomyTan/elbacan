@@ -66,7 +66,7 @@ export default function ElBacanApp() {
       <style dangerouslySetInnerHTML={{ __html: `
         /* --- FONTS & BASE --- */
         @font-face { font-family: 'Arpona'; src: url('/fonts/Arpona-Regular.otf') format('truetype'); font-weight: normal; font-style: normal; }
-        @font-face { font-family: 'Arpona-Semibold'; src: url('/fonts/Arpona-Semibold.otf') format('truetype'); font-weight: bold; font-style: normal; }
+        @font-face { font-family: 'Arpona-Semibold'; src: url('/fonts/Arpona-SemiBold.otf') format('truetype'); font-weight: bold; font-style: normal; }
         @font-face { font-family: 'GreatVibes'; src: url('/fonts/GreatVibes-Regular.ttf') format('truetype'); font-weight: normal; font-style: normal; }
         html { scroll-snap-type: y mandatory; }
         html, body { margin: 0; padding: 0; overflow-x: hidden; font-family: 'Arpona', serif; background-color: #000000; }
